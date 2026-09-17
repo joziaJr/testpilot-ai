@@ -1,0 +1,27 @@
+# dependencies
+/node_modules
+
+# Next.js outputs
+/.next
+/out
+/next-env.d.ts
+
+# tests and coverage
+/coverage
+/playwright-report
+/test-results
+/blob-report
+
+# local environment files; keep the safe template
+.env*
+!.env.example
+
+# logs and local tooling
+*.log
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+
+# editor settings
+.idea
+.vscode

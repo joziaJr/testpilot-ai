@@ -1,0 +1,53 @@
+# Architecture
+
+## Status and objective
+
+Approved direction: one full-stack web application using preferred Next.js, TypeScript, Tailwind CSS, shadcn/ui, and Zod. Use a simple table or justify TanStack Table; no microservices or unnecessary infrastructure. [PRD](../product/PRD.md), [Business Flow](../product/BUSINESS_FLOW.md), and [resolved OQ-03–OQ-14](../product/OPEN_QUESTIONS.md) govern the design. No implementation or package installation exists yet.
+
+```text
+Browser: upload / review / selection / preview / edit / delete / export
+    ↕ application requests and validated data
+Server: file validation → document parser → PRD Analyzer → output validation
+        selected requirements → Test Case Generator → output validation → IDs
+                                  ↕
+                         AI provider adapter
+```
+
+Only the Analyzer and Generator use AI. Arrows describe responsibilities, not endpoint contracts or deployment units.
+
+## Responsibilities and boundaries
+
+| Component                    | Responsibility                                                                                                                                                                              | Boundary                                                                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend                     | Three screens: Upload PRD, PRD Analysis, Test Case Preview; detected language, review/selection, loading/error feedback, separate FE/BE tabs, drafts, Save/Cancel, delete, export selection | Mandatory review before export; no AI credentials/direct privileged provider calls; safe text rendering                                                                    |
+| Server                       | Authoritative input validation, orchestration, provider access, output validation, request lifecycle                                                                                        | Do not trust client checks; never return raw provider errors or secrets                                                                                                    |
+| Document parsing             | Dedicated server PDF/DOCX/TXT parsing after extension/type/MIME and 10 MB checks                                                                                                            | Readable text PDF and standard OOXML DOCX only, neither encrypted; TXT UTF-8 with/without BOM; no OCR. Select compatible maintained parser libraries during implementation |
+| AI provider abstraction      | Configurable server-side provider/model; analysis/generation requests, credentials, errors, structured responses, available usage metadata                                                  | Start with a suitable free-tier provider; no UI provider selector or agent framework (PRD §25)                                                                             |
+| PRD Analyzer                 | Identify source-backed modules/features/requirements, rules, fields, validations, behavior, navigation, permissions, constraints, language, and uncertainty                                 | No case generation or invented rules; attempt detection only where the uploaded PRD supports it                                                                            |
+| Test Case Generator          | Generate requested FE/BE Positive/Negative/Edge coverage for selected requirements                                                                                                          | No unselected requirement expansion or invented API contracts                                                                                                              |
+| Structured output validation | Check shape, types, references, target, source grounding, duplicates, and completeness                                                                                                      | Schema validity alone cannot prove semantic correctness; uncertainty stays explicit                                                                                        |
+| Preview/edit state           | Render accepted cases, manage draft and saved edits, retain stable IDs                                                                                                                      | Save/Cancel must not mutate unrelated cases; deletion must not renumber others                                                                                             |
+| TSV generation               | Serialize current saved edits with selected columns in fixed schema order                                                                                                                   | Deterministic code; no AI or reorder control; no internal metadata in default columns                                                                                      |
+| Usage recording              | Record Action, Model, Input Tokens, Output Tokens, Total Tokens, Timestamp for every AI request where available                                                                             | Actions: `prd_analysis`, `generate_frontend`, `generate_backend`; no dedicated dashboard required (PRD §26)                                                                |
+
+## Data model recommendation
+
+Keep source context, requirements, selected modules/features, request/session identity, case data, and column selection distinct. Use PRD §17's preferred test_cases object with steps arrays and strict Zod validation. Required fields are ID, Module, Feature, Title, Steps, Expected Result, Priority, Type; nullable presentation fields are Preconditions, Automation, Notes. Render absent optional values as `-` where needed. Minimal internal grounding does not authorize user-facing source references or full traceability features.
+
+Use the identical FE/BE schema in [Test Case Guide](../qa/TEST_CASE_GUIDE.md). Application code allocates immutable TP-FE/TP-BE IDs with independent active-session counters; additional cases continue, deletion never renumbers, new sessions may restart at 001. Priority High/Medium/Low, Type Positive/Negative/Edge, Automation Yes/No/Candidate. Candidate is preferred for future suitability; Yes needs contextual justification, not fabricated automation claims. Coverage drives quantity.
+
+## State and session recommendation
+
+Retain PRD metadata, extracted requirements, detected language, selection, FE/BE cases and edits during internal navigation. Prefer session-level browser storage for refresh preservation if feasible; tab/browser close may discard. Do not persist permanent projects/history. Keep raw files only for processing, no public upload URLs; extracted content/results only for the active session. Usage metadata may persist without PRD bodies (OQ-06/OQ-13).
+
+Confirm before replacing a session with a new PRD when unsaved/current generated data exists. Associate all analysis/generation requests with request/session identifiers and prevent older responses overwriting newer state. Separate draft/saved edits for Save/Cancel. Only one active request per same generation action; prevent repeated submits. Reject invalid/incomplete output, allow at most one automatic retry for transient provider/network failure, and expose recoverable failure. Individual-case regeneration remains excluded.
+
+Use one deterministic TSV serializer for nonempty FE/BE layers, named testpilot_frontend.tsv and testpilot_backend.tsv. Skip empty layers with UI indication. First nine schema columns default selected, Automation/Notes unselected; fixed schema order, no reorder controls, no preview data deletion. Format: UTF-8 BOM, CRLF, TAB. Keep numbered steps in one cell using a deterministic readable separator; normalize raw tabs/newlines and render values beginning with `=`, `+`, `-`, or `@` as literal text. Choose and test the concrete sanitization strategy during implementation (OQ-07/OQ-08).
+
+## Failure and security boundaries
+
+File validation, extraction, AI transport/schema, session, and export are separate failure boundaries. Centralize timeout/context/resource configuration; configured model context limits may apply, no initial numerical SLO required. Keep responsive/loading UI and usable large previews. Apply [Error Handling](ERROR_HANDLING.md), [Security](SECURITY.md), and [Environment](ENVIRONMENT.md).
+
+## Implementation entry conditions
+
+Before implementing, inspect state and select compatible tool versions/parser libraries within approved direction. One server-configurable provider adapter may initially use a suitable Gemini API free-tier model; no provider selector. Both uses analysis, frontend-generation, backend-generation usage actions with missing counters null. No unresolved MVP-blocking Open Questions remain. M0 starts only under separate authorization.

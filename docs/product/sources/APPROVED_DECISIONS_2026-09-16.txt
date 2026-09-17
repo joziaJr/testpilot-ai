@@ -1,0 +1,795 @@
+The following Open Questions are now approved product/engineering decisions for the TestPilot AI MVP.
+
+Treat these decisions as the new baseline for implementation planning.
+
+Update `docs/product/OPEN_QUESTIONS.md` and every affected product, engineering, QA, security, environment, architecture, and release document so they remain consistent.
+
+Do NOT implement application features yet.
+
+Do NOT change the approved PRD or Business Flow unless a clarification below needs to be reflected in a derived document.
+
+---
+
+# OQ-03 — File Upload Limits and Supported Documents
+
+## Decision
+
+Maximum upload size:
+
+`10 MB per file`
+
+Supported formats:
+
+### PDF
+
+* Text-based PDF only.
+* PDF must contain extractable/readable text.
+* Image-only/scanned PDF is unsupported in MVP.
+* Encrypted/password-protected PDF is unsupported.
+
+### DOCX
+
+* Standard Office Open XML `.docx`.
+* Password-protected/encrypted DOCX is unsupported.
+
+### TXT
+
+Supported encoding:
+
+* UTF-8
+* UTF-8 with BOM
+
+Other encodings are not guaranteed in MVP.
+
+## Validation
+
+File validation must happen server-side.
+
+Do not rely only on filename extension.
+
+Validate extension and actual file type/MIME where reasonably possible.
+
+## Expected behavior
+
+* Valid readable file → accepted.
+* File >10 MB → rejected.
+* Unsupported format → rejected.
+* Encrypted/password-protected file → rejected.
+* File without readable text → rejected.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-04 — Dominant Language for Mixed PRDs
+
+## Decision
+
+For mixed Indonesian + English PRDs, determine the dominant language based primarily on requirement content.
+
+Priority:
+
+1. Requirement sentences/content.
+2. Majority language across meaningful PRD content.
+3. If still tied, use the language of the first primary section/heading as deterministic fallback.
+
+The generated test case content must use one consistent output language.
+
+Do not mix languages between Title, Preconditions, Steps, and Expected Result.
+
+Headers and structured enum values remain standardized.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-05 — Ambiguous Requirements and Empty Selection
+
+## Decision
+
+Ambiguous or incomplete requirements must be marked:
+
+`Need Confirmation`
+
+A requirement that depends on missing information must NOT generate testcase scenarios that assume that missing information.
+
+However, ambiguity in one rule must not block unrelated valid requirements in the same feature.
+
+Example:
+
+If maximum file size is unknown but allowed file type is documented:
+
+* Maximum-size boundary cases → do not generate.
+* File-type validation cases → may still generate.
+
+## Empty Module / Feature Selection
+
+At least one module or feature must be selected before generation.
+
+If nothing is selected:
+
+* Generation must not start.
+* Generate action should be disabled or rejected with a clear validation message.
+
+Suggested message:
+
+`Select at least one module or feature.`
+
+Editing the PRD analysis itself is not part of MVP unless explicitly approved later.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-06 — Active Session Lifecycle
+
+## Decision
+
+MVP uses only an active generation session.
+
+No permanent project history is required.
+
+The active session should retain:
+
+* PRD metadata.
+* Extracted requirements.
+* Detected language.
+* Selected modules/features.
+* FE test cases.
+* BE test cases.
+
+## Lifecycle
+
+Internal application navigation:
+
+* Session data should remain available.
+
+Refresh:
+
+* Prefer preserving the active session using appropriate session-level browser storage if feasible.
+
+Closing the tab/browser:
+
+* Session may be discarded.
+
+Uploading a new PRD:
+
+* Must not silently overwrite the current session.
+* Ask for confirmation before replacement if unsaved/current generated data exists.
+
+## Concurrent / Stale AI Responses
+
+Each analysis/generation request must be associated with a request/session identifier.
+
+A response from an older PRD/request must never overwrite a newer active session.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-07 — Export Defaults and Column Behavior
+
+## Decision
+
+Default selected export columns:
+
+* Test Case ID
+* Module
+* Feature
+* Title
+* Preconditions
+* Steps
+* Expected Result
+* Priority
+* Type
+
+Default unselected:
+
+* Automation
+* Notes
+
+## Ordering
+
+For MVP, export column order follows the TestPilot schema.
+
+Do not implement drag-and-drop/reorder controls yet.
+
+Custom column ordering is post-MVP.
+
+## Empty FE / BE Result
+
+If one layer contains zero testcases, do not create an empty TSV for that layer.
+
+Example:
+
+Frontend = 25 cases
+Backend = 0 cases
+
+Export only:
+
+`testpilot_frontend.tsv`
+
+The UI should clearly indicate that no Backend testcases are available.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-08 — TSV Technical Format and Spreadsheet Safety
+
+## Decision
+
+TSV output:
+
+* Encoding: UTF-8 with BOM.
+* Line ending: CRLF.
+* Delimiter: TAB.
+
+The output must be usable in common Excel and Google Sheets workflows.
+
+## Steps Serialization
+
+Steps must remain in one TSV cell.
+
+For MVP, serialize multiple steps in a deterministic readable format, for example:
+
+`1. Open Login | 2. Enter email | 3. Click Login`
+
+Do not allow raw tab/newline characters to break TSV structure.
+
+## Escaping / Sanitization
+
+Tabs, line breaks, and other characters that can corrupt TSV structure must be sanitized or normalized.
+
+## Spreadsheet Formula Injection
+
+Values beginning with spreadsheet formula indicators must be treated as literal text.
+
+Protect values beginning with characters such as:
+
+* `=`
+* `+`
+* `-`
+* `@`
+
+Use a safe deterministic sanitization strategy.
+
+Security tests must cover TSV/spreadsheet formula injection.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-09 — Automation Field, Empty Fields, and Test Case ID Lifetime
+
+## Automation
+
+For MVP, `Automation` represents automation suitability/status suggestion, not proof that an automated script already exists.
+
+Allowed values:
+
+* `Yes`
+* `No`
+* `Candidate`
+
+Recommended generation behavior:
+
+Use `Candidate` where a testcase appears suitable for future automation but is not known to already be automated.
+
+Do not claim `Yes` unless that meaning is explicitly justified by the implementation/context.
+
+## Required Test Case Fields
+
+Required:
+
+* Test Case ID
+* Module
+* Feature
+* Title
+* Steps
+* Expected Result
+* Priority
+* Type
+
+Optional/nullable presentation fields:
+
+* Preconditions
+* Automation
+* Notes
+
+Where a display/export value is required but no information exists, use:
+
+`-`
+
+Do not invent content only to avoid an empty field.
+
+## Test Case ID Lifecycle
+
+ID counters are scoped to the active generation session.
+
+Example:
+
+Frontend:
+`TP-FE-001`
+
+Backend:
+`TP-BE-001`
+
+IDs must remain immutable once assigned.
+
+Deleting a testcase does not renumber remaining cases.
+
+Generating additional cases in the same active session continues the counter.
+
+A completely new generation session may start counters again from `001`.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-10 — Need Confirmation Representation
+
+## Decision
+
+`Need Confirmation` belongs primarily to the structured PRD analysis.
+
+Recommended representation:
+
+```json
+{
+  "status": "need_confirmation",
+  "requirement": "User can upload a file with an appropriate size.",
+  "reason": "Maximum supported file size is not defined.",
+  "missing_details": [
+    "maximum_file_size"
+  ]
+}
+```
+
+## UI
+
+Display the item clearly during PRD Analysis.
+
+Example:
+
+`Need Confirmation`
+
+Reason:
+
+`Maximum supported file size is not defined.`
+
+## Generation Behavior
+
+Testcases that require the missing detail must not be generated.
+
+Other source-backed scenarios may still be generated.
+
+## Export
+
+Do not introduce a new default `Need Confirmation` testcase column for MVP.
+
+Need Confirmation remains analysis metadata unless a future approved feature changes this.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-11 — Technical Stack, AI Provider, Schemas, and Usage Mapping
+
+## Approved MVP Direction
+
+Use a single full-stack web application.
+
+Preferred baseline:
+
+* Next.js
+* TypeScript
+* Tailwind CSS
+* shadcn/ui
+* Zod for structured schema validation
+
+A simple table implementation or TanStack Table may be used if justified.
+
+Avoid unnecessary infrastructure.
+
+No microservices are needed for MVP.
+
+## Document Processing
+
+Use dedicated server-side parsing for:
+
+* PDF
+* DOCX
+* TXT
+
+Parser library choice may be selected during architecture implementation based on maintainability and compatibility.
+
+## AI Provider
+
+Use one server-side configurable AI provider adapter.
+
+Initial development provider may use a suitable Gemini API free-tier model.
+
+The provider/model must be configurable through environment/configuration.
+
+The UI must not expose provider selection in MVP.
+
+## AI Responsibilities
+
+Keep two logical AI processes:
+
+1. PRD Analyzer
+2. Test Case Generator
+
+## Structured Output
+
+Use strict structured JSON validated by application schemas.
+
+Invalid structured output must not be treated as valid application data.
+
+## Both Mode Usage Mapping
+
+When the user selects Both:
+
+1. `prd_analysis`
+2. `generate_frontend`
+3. `generate_backend`
+
+Do not introduce a separate `generate_both` usage action for MVP.
+
+## Missing Usage Metadata
+
+If a provider does not return a usage value:
+
+Store:
+
+`null`
+
+Do not store `0`, because zero means a known zero usage value.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-12 — Runtime, Retry, Duplicate Requests, and Partial Responses
+
+## Duplicate Requests
+
+Only one active request for the same generation action should be allowed within the active UI flow.
+
+Disable/prevent repeated submission while the same request is processing.
+
+## Retry
+
+Use a maximum of:
+
+`1 automatic retry`
+
+for transient provider/network failures.
+
+Examples where retry may apply:
+
+* Temporary timeout.
+* Temporary provider unavailable.
+* Relevant 5xx response.
+* Retryable rate-limit response.
+
+Do not automatically retry:
+
+* Unsupported documents.
+* Validation errors.
+* Deterministic application errors.
+* Invalid user selection.
+
+## Partial / Invalid AI Response
+
+Incomplete or invalid structured output must be rejected.
+
+Do not display a partial testcase payload as a successful generation result.
+
+Allow retry through the defined error/retry flow.
+
+## Timeout and Resource Limits
+
+Timeout/context/resource limits must be centralized through configuration.
+
+Do not scatter arbitrary hardcoded values across the project.
+
+Exact provider-specific context limits may follow the configured model/provider.
+
+## Performance
+
+The UI must:
+
+* Remain responsive.
+* Show processing/loading state.
+* Prevent accidental duplicate submits.
+* Clearly expose recoverable failures.
+
+Exact performance SLOs are not required for the initial MVP unless evidence later requires them.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-13 — Storage, Retention, Privacy, and Secrets
+
+## Raw PRD
+
+Do not permanently retain uploaded PRDs in MVP.
+
+Raw files should exist only for the minimum time required for processing.
+
+Do not expose uploads through public URLs.
+
+## Extracted PRD Content
+
+Keep only as necessary for the active generation session.
+
+No permanent PRD history is required.
+
+## Generated Testcases
+
+Persist only within the active generation/session behavior required by the MVP.
+
+Permanent history is post-MVP.
+
+## AI Usage Records
+
+Usage tracking may persist metadata such as:
+
+* Action.
+* Model.
+* Input Tokens.
+* Output Tokens.
+* Total Tokens.
+* Timestamp.
+
+Do not store full PRD content inside usage logs.
+
+## Logging
+
+Avoid logging:
+
+* Full PRD body.
+* Sensitive file content.
+* AI API keys.
+* Secrets.
+
+## Secrets
+
+AI/API credentials:
+
+* Server-side only.
+* Environment variables or approved secret storage.
+* Never exposed to client bundles.
+* Never committed to Git.
+
+Provide `.env.example` without real secrets.
+
+## Provider Retention
+
+Document the selected provider's applicable retention/privacy behavior during implementation/deployment setup.
+
+Do not make unsupported privacy guarantees.
+
+## Status
+
+RESOLVED
+
+---
+
+# OQ-14 — Development Version and Release Tooling
+
+## Development Version
+
+Start development at:
+
+`0.1.0`
+
+Use `0.x.x` while the application is under active pre-stable development.
+
+Stable MVP release:
+
+`1.0.0`
+
+only after the approved MVP Definition of Done is satisfied.
+
+## Release Tooling
+
+Preferred baseline:
+
+* Husky
+* Commitlint
+* Conventional Commits
+* GitHub Actions
+* Release Please
+
+Equivalent tooling may only replace these if there is a clear technical reason and documentation is updated.
+
+## Release Flow
+
+Expected:
+
+Feature Branch
+→ Development
+→ Commit
+→ Husky checks
+→ Push
+→ Pull Request
+→ CI
+→ Review
+→ Merge to Main
+→ Automated release/version process
+
+## Version Rules
+
+* `fix` → PATCH
+* `feat` → MINOR
+* breaking change → MAJOR
+
+No version bump on every local push.
+
+## Tags
+
+Use semantic version tags such as:
+
+`v0.1.0`
+`v0.2.0`
+`v1.0.0`
+
+## Release Candidate
+
+A dedicated RC strategy is not required for the earliest MVP development.
+
+It may be introduced before the stable `1.0.0` release if needed.
+
+## Release Owner
+
+For the current project, the repository maintainer/project owner is the release owner.
+
+## Compatibility
+
+No formal public backwards-compatibility guarantee is required during `0.x.x`.
+
+Breaking architecture/product changes must still be documented and traceable.
+
+## Status
+
+RESOLVED
+
+---
+
+# REQUIRED DOCUMENTATION UPDATE
+
+Now update the repository documentation based on these resolved decisions.
+
+At minimum review and reconcile:
+
+* `docs/product/OPEN_QUESTIONS.md`
+* `docs/product/MVP_SCOPE.md`
+* `docs/engineering/ARCHITECTURE.md`
+* `docs/engineering/AI_ARCHITECTURE.md`
+* `docs/engineering/AI_RULES.md`
+* `docs/engineering/DEVELOPMENT_GUIDE.md`
+* `docs/engineering/ENVIRONMENT.md` or equivalent
+* `docs/engineering/ERROR_HANDLING.md`
+* `docs/engineering/SECURITY.md`
+* `docs/engineering/VERSIONING_RELEASE.md`
+* `docs/qa/TEST_STRATEGY.md`
+* `docs/qa/TEST_PLAN.md`
+* `docs/qa/AI_EVALUATION_STRATEGY.md`
+* `docs/qa/SECURITY_TESTING.md`
+* `docs/qa/PENETRATION_TEST_PLAN.md`
+* `docs/qa/TEST_CASE_GUIDE.md`
+* `docs/qa/TEST_DATA_GUIDE.md`
+* `docs/qa/REGRESSION_CHECKLIST.md`
+* `docs/qa/RELEASE_CHECKLIST.md`
+* `docs/qa/TRACEABILITY.md`
+* `README.md`
+* `AGENTS.md`
+* `FOUNDATION_REVIEW.md`
+
+Do not modify the approved PRD or Business Flow unless necessary to correct a direct inconsistency, and report any such proposed change before making it.
+
+---
+
+# OPEN QUESTIONS STATUS
+
+OQ-03 through OQ-14 are now considered resolved.
+
+Do not silently delete their history.
+
+Update `OPEN_QUESTIONS.md` so these decisions remain traceable, including:
+
+* Question ID
+* Final decision
+* Status
+* Decision rationale where useful
+* Affected documents
+
+If no new genuine blocker is discovered, the active Open Questions section should contain no unresolved MVP-blocking items.
+
+Do not create replacement questions simply to keep the file populated.
+
+---
+
+# FINAL VALIDATION
+
+After updating documentation:
+
+1. Validate internal documentation links.
+2. Check PRD and Business Flow source files remain unchanged.
+3. Check FE/BE testcase schemas remain consistent.
+4. Check security documentation covers file upload, prompt injection, secret leakage, XSS/injection, TSV formula injection, rate limiting, and DoS considerations.
+5. Check AI evaluation covers hallucination, duplication, FE/BE relevance, Need Confirmation, language consistency, and structured output validity.
+6. Check versioning documentation matches the decisions above.
+7. Check no application feature code was implemented.
+
+---
+
+# FINAL REPORT
+
+Return:
+
+## Resolved Decisions
+
+Confirm OQ-03 through OQ-14.
+
+## Files Modified
+
+List all updated files.
+
+## Remaining Open Questions
+
+List only genuinely unresolved items.
+
+If none:
+
+`No unresolved MVP-blocking Open Questions.`
+
+## Architecture Baseline
+
+Summarize the now-approved architecture direction.
+
+## QA Baseline
+
+Summarize testing and AI evaluation coverage.
+
+## Security Baseline
+
+Summarize security and penetration-test preparation.
+
+## Release Baseline
+
+Summarize versioning, Husky, CI, and release decisions.
+
+## Readiness
+
+State whether the repository is ready to proceed to:
+
+`M0 — Project Foundation`
+
+Do NOT begin M0 implementation in this task.
+
+Stop after documentation reconciliation and final reporting.

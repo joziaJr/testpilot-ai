@@ -1,0 +1,1322 @@
+You are a Senior Software Engineer, AI Engineer, and Senior QA Engineer responsible for preparing the foundation of the TestPilot AI project.
+
+The project already has an approved Product Requirement Document and Business Flow.
+
+Your first responsibility is NOT to build application features.
+
+Your first responsibility is to establish a complete, structured, maintainable project documentation and QA foundation so that future coding agents can understand the project by reading the repository.
+
+---
+
+# PRIMARY OBJECTIVE
+
+Prepare the TestPilot AI repository so that any future coding agent can understand:
+
+* What the product is.
+* What belongs to the MVP.
+* What is explicitly out of scope.
+* How the business flow works.
+* How the application should be architected.
+* How AI should process PRDs.
+* What AI is allowed and not allowed to infer.
+* How Frontend and Backend test cases differ.
+* How the application should be tested.
+* How bugs should be documented.
+* How releases should be validated.
+* How versioning works.
+* How changes should be committed and released.
+* What rules every future agent must follow.
+
+Do not implement product features yet.
+
+---
+
+# SOURCE OF TRUTH
+
+Treat the following documents as authoritative:
+
+1. Product Requirement Document
+2. Business Flow
+
+Do not silently change product behavior described in those documents.
+
+Do not add features outside the approved MVP.
+
+If something is unclear, document it as:
+
+`Open Question`
+
+Do not invent the answer.
+
+---
+
+# REQUIRED REPOSITORY STRUCTURE
+
+Create or prepare the following documentation structure:
+
+```text
+docs/
+├── product/
+│   ├── PRD.md
+│   ├── BUSINESS_FLOW.md
+│   └── MVP_SCOPE.md
+│
+├── engineering/
+│   ├── ARCHITECTURE.md
+│   ├── DEVELOPMENT_GUIDE.md
+│   ├── AI_ARCHITECTURE.md
+│   ├── AI_RULES.md
+│   ├── ERROR_HANDLING.md
+│   ├── SECURITY.md
+│   └── VERSIONING_RELEASE.md
+│
+└── qa/
+    ├── TEST_STRATEGY.md
+    ├── TEST_PLAN.md
+    ├── TEST_CASE_GUIDE.md
+    ├── TEST_DATA_GUIDE.md
+    ├── BUG_REPORResume the previous TestPilot AI documentation bootstrap task from the current repository state.
+
+The previous run was interrupted by a connection error after files had already been created and modified.
+
+IMPORTANT:
+- Do NOT restart the task from scratch.
+- Do NOT overwrite or discard completed work.
+- Do NOT revert existing changes.
+- Inspect the current repository and continue only from what is still incomplete.
+- Preserve all approved product documentation.
+- Do NOT implement application features yet.
+
+Treat these as the authoritative product source of truth:
+
+1. `docs/product/PRD.md`
+2. `docs/product/BUSINESS_FLOW.md`
+
+First:
+
+1. Inspect all currently created and modified files.
+2. Determine what was completed before the interruption.
+3. Determine what documentation is still missing or incomplete.
+4. Reconcile all documentation against the approved PRD and Business Flow.
+5. Remove or correct assumptions that are already resolved by the approved documents.
+6. Keep genuinely unresolved items marked as `Open Question`.
+
+Complete the documentation foundation required for TestPilot AI.
+
+The expected documentation baseline should cover:
+
+PRODUCT
+- PRD
+- Business Flow
+- MVP Scope
+
+ENGINEERING
+- Technical Architecture
+- Development Guide
+- AI Architecture
+- AI Rules
+- Error Handling
+- Security
+- Environment Setup
+- Versioning & Release Management
+
+QA
+- Test Strategy
+- Test Plan
+- Test Case Guide
+- Test Data Guide
+- AI Evaluation Strategy
+- Traceability
+- Regression Checklist
+- Bug Report Guide
+- Release Checklist
+
+SECURITY / AI SECURITY
+Also include planning documentation for security testing.
+
+At minimum document security test coverage for:
+- file upload validation
+- malicious or malformed files
+- oversized files
+- fake file extensions / MIME mismatch
+- XSS
+- injection risks
+- API abuse
+- rate limiting
+- secret/API key exposure
+- unsafe PRD content
+- prompt injection
+- system prompt leakage attempts
+- AI instruction hijacking
+- cross-user/data leakage risk
+- TSV / spreadsheet formula injection
+- dependency vulnerabilities
+- denial-of-service considerations
+
+Penetration testing does NOT need to be executed yet because the application has not been implemented.
+
+However, prepare the security testing strategy and penetration testing plan so they are ready for use after the MVP is functional.
+
+QA documentation must clearly separate:
+
+1. Normal software functional testing
+2. Backend/API testing
+3. AI output quality evaluation
+4. AI hallucination testing
+5. AI security / prompt injection testing
+6. Security testing
+7. Regression testing
+
+Prepare the project so that future agents can understand the complete development and QA process only by reading the repository documentation.
+
+Do not create fictional test execution results.
+Do not create fictional bugs.
+Do not claim tests were executed when they were not.
+Actual Result and Status must remain unfilled until real execution happens.
+
+When finished, provide a final report containing:
+
+## Documentation Status
+- Completed documents
+- Incomplete documents
+- Newly created documents
+
+## Files Changed
+List every file created or modified.
+
+## Architecture Decisions
+List proposed architecture decisions only.
+
+## QA Foundation
+Summarize the testing documentation that is now available.
+
+## Security Foundation
+Summarize security and penetration-testing preparation.
+
+## Open Questions
+List only genuinely unresolved product or technical decisions.
+
+## Readiness Assessment
+State whether the documentation baseline is ready for architecture review before implementation.
+
+Do NOT start application implementation after completing this task.
+Stop after the documentation baseline is complete.Resume the previous TestPilot AI documentation bootstrap task from the current repository state.
+
+The previous run was interrupted by a connection error after files had already been created and modified.
+
+IMPORTANT:
+- Do NOT restart the task from scratch.
+- Do NOT overwrite or discard completed work.
+- Do NOT revert existing changes.
+- Inspect the current repository and continue only from what is still incomplete.
+- Preserve all approved product documentation.
+- Do NOT implement application features yet.
+
+Treat these as the authoritative product source of truth:
+
+1. `docs/product/PRD.md`
+2. `docs/product/BUSINESS_FLOW.md`
+
+First:
+
+1. Inspect all currently created and modified files.
+2. Determine what was completed before the interruption.
+3. Determine what documentation is still missing or incomplete.
+4. Reconcile all documentation against the approved PRD and Business Flow.
+5. Remove or correct assumptions that are already resolved by the approved documents.
+6. Keep genuinely unresolved items marked as `Open Question`.
+
+Complete the documentation foundation required for TestPilot AI.
+
+The expected documentation baseline should cover:
+
+PRODUCT
+- PRD
+- Business Flow
+- MVP Scope
+
+ENGINEERING
+- Technical Architecture
+- Development Guide
+- AI Architecture
+- AI Rules
+- Error Handling
+- Security
+- Environment Setup
+- Versioning & Release Management
+
+QA
+- Test Strategy
+- Test Plan
+- Test Case Guide
+- Test Data Guide
+- AI Evaluation Strategy
+- Traceability
+- Regression Checklist
+- Bug Report Guide
+- Release Checklist
+
+SECURITY / AI SECURITY
+Also include planning documentation for security testing.
+
+At minimum document security test coverage for:
+- file upload validation
+- malicious or malformed files
+- oversized files
+- fake file extensions / MIME mismatch
+- XSS
+- injection risks
+- API abuse
+- rate limiting
+- secret/API key exposure
+- unsafe PRD content
+- prompt injection
+- system prompt leakage attempts
+- AI instruction hijacking
+- cross-user/data leakage risk
+- TSV / spreadsheet formula injection
+- dependency vulnerabilities
+- denial-of-service considerations
+
+Penetration testing does NOT need to be executed yet because the application has not been implemented.
+
+However, prepare the security testing strategy and penetration testing plan so they are ready for use after the MVP is functional.
+
+QA documentation must clearly separate:
+
+1. Normal software functional testing
+2. Backend/API testing
+3. AI output quality evaluation
+4. AI hallucination testing
+5. AI security / prompt injection testing
+6. Security testing
+7. Regression testing
+
+Prepare the project so that future agents can understand the complete development and QA process only by reading the repository documentation.
+
+Do not create fictional test execution results.
+Do not create fictional bugs.
+Do not claim tests were executed when they were not.
+Actual Result and Status must remain unfilled until real execution happens.
+
+When finished, provide a final report containing:
+
+## Documentation Status
+- Completed documents
+- Incomplete documents
+- Newly created documents
+
+## Files Changed
+List every file created or modified.
+
+## Architecture Decisions
+List proposed architecture decisions only.
+
+## QA Foundation
+Summarize the testing documentation that is now available.
+
+## Security Foundation
+Summarize security and penetration-testing preparation.
+
+## Open Questions
+List only genuinely unresolved product or technical decisions.
+
+## Readiness Assessment
+State whether the documentation baseline is ready for architecture review before implementation.
+
+Do NOT start application implementation after completing this task.
+Stop after the documentation baseline is complete.Resume the previous TestPilot AI documentation bootstrap task from the current repository state.
+
+The previous run was interrupted by a connection error after files had already been created and modified.
+
+IMPORTANT:
+- Do NOT restart the task from scratch.
+- Do NOT overwrite or discard completed work.
+- Do NOT revert existing changes.
+- Inspect the current repository and continue only from what is still incomplete.
+- Preserve all approved product documentation.
+- Do NOT implement application features yet.
+
+Treat these as the authoritative product source of truth:
+
+1. `docs/product/PRD.md`
+2. `docs/product/BUSINESS_FLOW.md`
+
+First:
+
+1. Inspect all currently created and modified files.
+2. Determine what was completed before the interruption.
+3. Determine what documentation is still missing or incomplete.
+4. Reconcile all documentation against the approved PRD and Business Flow.
+5. Remove or correct assumptions that are already resolved by the approved documents.
+6. Keep genuinely unresolved items marked as `Open Question`.
+
+Complete the documentation foundation required for TestPilot AI.
+
+The expected documentation baseline should cover:
+
+PRODUCT
+- PRD
+- Business Flow
+- MVP Scope
+
+ENGINEERING
+- Technical Architecture
+- Development Guide
+- AI Architecture
+- AI Rules
+- Error Handling
+- Security
+- Environment Setup
+- Versioning & Release Management
+
+QA
+- Test Strategy
+- Test Plan
+- Test Case Guide
+- Test Data Guide
+- AI Evaluation Strategy
+- Traceability
+- Regression Checklist
+- Bug Report Guide
+- Release Checklist
+
+SECURITY / AI SECURITY
+Also include planning documentation for security testing.
+
+At minimum document security test coverage for:
+- file upload validation
+- malicious or malformed files
+- oversized files
+- fake file extensions / MIME mismatch
+- XSS
+- injection risks
+- API abuse
+- rate limiting
+- secret/API key exposure
+- unsafe PRD content
+- prompt injection
+- system prompt leakage attempts
+- AI instruction hijacking
+- cross-user/data leakage risk
+- TSV / spreadsheet formula injection
+- dependency vulnerabilities
+- denial-of-service considerations
+
+Penetration testing does NOT need to be executed yet because the application has not been implemented.
+
+However, prepare the security testing strategy and penetration testing plan so they are ready for use after the MVP is functional.
+
+QA documentation must clearly separate:
+
+1. Normal software functional testing
+2. Backend/API testing
+3. AI output quality evaluation
+4. AI hallucination testing
+5. AI security / prompt injection testing
+6. Security testing
+7. Regression testing
+
+Prepare the project so that future agents can understand the complete development and QA process only by reading the repository documentation.
+
+Do not create fictional test execution results.
+Do not create fictional bugs.
+Do not claim tests were executed when they were not.
+Actual Result and Status must remain unfilled until real execution happens.
+
+When finished, provide a final report containing:
+
+## Documentation Status
+- Completed documents
+- Incomplete documents
+- Newly created documents
+
+## Files Changed
+List every file created or modified.
+
+## Architecture Decisions
+List proposed architecture decisions only.
+
+## QA Foundation
+Summarize the testing documentation that is now available.
+
+## Security Foundation
+Summarize security and penetration-testing preparation.
+
+## Open Questions
+List only genuinely unresolved product or technical decisions.
+
+## Readiness Assessment
+State whether the documentation baseline is ready for architecture review before implementation.
+
+Do NOT start application implementation after completing this task.
+Stop after the documentation baseline is complete.Resume the previous TestPilot AI documentation bootstrap task from the current repository state.
+
+The previous run was interrupted by a connection error after files had already been created and modified.
+
+IMPORTANT:
+- Do NOT restart the task from scratch.
+- Do NOT overwrite or discard completed work.
+- Do NOT revert existing changes.
+- Inspect the current repository and continue only from what is still incomplete.
+- Preserve all approved product documentation.
+- Do NOT implement application features yet.
+
+Treat these as the authoritative product source of truth:
+
+1. `docs/product/PRD.md`
+2. `docs/product/BUSINESS_FLOW.md`
+
+First:
+
+1. Inspect all currently created and modified files.
+2. Determine what was completed before the interruption.
+3. Determine what documentation is still missing or incomplete.
+4. Reconcile all documentation against the approved PRD and Business Flow.
+5. Remove or correct assumptions that are already resolved by the approved documents.
+6. Keep genuinely unresolved items marked as `Open Question`.
+
+Complete the documentation foundation required for TestPilot AI.
+
+The expected documentation baseline should cover:
+
+PRODUCT
+- PRD
+- Business Flow
+- MVP Scope
+
+ENGINEERING
+- Technical Architecture
+- Development Guide
+- AI Architecture
+- AI Rules
+- Error Handling
+- Security
+- Environment Setup
+- Versioning & Release Management
+
+QA
+- Test Strategy
+- Test Plan
+- Test Case Guide
+- Test Data Guide
+- AI Evaluation Strategy
+- Traceability
+- Regression Checklist
+- Bug Report Guide
+- Release Checklist
+
+SECURITY / AI SECURITY
+Also include planning documentation for security testing.
+
+At minimum document security test coverage for:
+- file upload validation
+- malicious or malformed files
+- oversized files
+- fake file extensions / MIME mismatch
+- XSS
+- injection risks
+- API abuse
+- rate limiting
+- secret/API key exposure
+- unsafe PRD content
+- prompt injection
+- system prompt leakage attempts
+- AI instruction hijacking
+- cross-user/data leakage risk
+- TSV / spreadsheet formula injection
+- dependency vulnerabilities
+- denial-of-service considerations
+
+Penetration testing does NOT need to be executed yet because the application has not been implemented.
+
+However, prepare the security testing strategy and penetration testing plan so they are ready for use after the MVP is functional.
+
+QA documentation must clearly separate:
+
+1. Normal software functional testing
+2. Backend/API testing
+3. AI output quality evaluation
+4. AI hallucination testing
+5. AI security / prompt injection testing
+6. Security testing
+7. Regression testing
+
+Prepare the project so that future agents can understand the complete development and QA process only by reading the repository documentation.
+
+Do not create fictional test execution results.
+Do not create fictional bugs.
+Do not claim tests were executed when they were not.
+Actual Result and Status must remain unfilled until real execution happens.
+
+When finished, provide a final report containing:
+
+## Documentation Status
+- Completed documents
+- Incomplete documents
+- Newly created documents
+
+## Files Changed
+List every file created or modified.
+
+## Architecture Decisions
+List proposed architecture decisions only.
+
+## QA Foundation
+Summarize the testing documentation that is now available.
+
+## Security Foundation
+Summarize security and penetration-testing preparation.
+
+## Open Questions
+List only genuinely unresolved product or technical decisions.
+
+## Readiness Assessment
+State whether the documentation baseline is ready for architecture review before implementation.
+
+Do NOT start application implementation after completing this task.
+Stop after the documentation baseline is complete.T_GUIDE.md
+    ├── TRACEABILITY.md
+    └── RELEASE_CHECKLIST.md
+
+qa/
+├── test-cases/
+│   ├── frontend/
+│   └── backend/
+│
+├── test-execution/
+│   ├── frontend/
+│   └── backend/
+│
+├── bug-reports/
+│   ├── frontend/
+│   └── backend/
+│
+├── test-data/
+└── automation/
+```
+
+Do not create meaningless placeholder files.
+
+Each document must have a clear purpose.
+
+---
+
+# PRODUCT DOCUMENTATION
+
+## PRD.md
+
+Preserve the approved TestPilot AI MVP requirements.
+
+Do not reinterpret the PRD.
+
+---
+
+## BUSINESS_FLOW.md
+
+Document the approved user/business flow:
+
+```text
+Upload PRD
+→ Validate File
+→ Extract Content
+→ AI Analyze PRD
+→ Review Module / Feature
+→ Select Requirements
+→ Select FE / BE / Both
+→ Generate Positive / Negative / Edge Cases
+→ Preview
+→ Edit / Delete
+→ Select Export Columns
+→ Export TSV
+```
+
+---
+
+## MVP_SCOPE.md
+
+Clearly separate:
+
+### In Scope
+
+Only approved MVP functionality.
+
+### Out of Scope
+
+Including but not limited to:
+
+* Authentication
+* Team collaboration
+* Jira integration
+* GitHub integration
+* Test execution module
+* Bug reporting module
+* Playwright generation
+* XLSX export
+* OCR
+* PRD version comparison
+* Autonomous multi-agent system
+
+This document exists to prevent scope creep during vibe coding.
+
+---
+
+# ENGINEERING DOCUMENTATION
+
+## ARCHITECTURE.md
+
+Describe the recommended MVP architecture.
+
+Include:
+
+* Frontend responsibilities.
+* Server responsibilities.
+* Document parsing.
+* AI provider abstraction.
+* PRD Analyzer.
+* Test Case Generator.
+* Structured output validation.
+* Test case preview.
+* TSV generation.
+* Session/state handling.
+* Error handling boundaries.
+
+Prefer the simplest architecture capable of supporting the MVP.
+
+Do not overengineer.
+
+---
+
+# AI_ARCHITECTURE.md
+
+Document the complete AI pipeline.
+
+Expected concept:
+
+```text
+PRD
+↓
+Document Extraction
+↓
+PRD Analyzer
+↓
+Structured Requirements
+↓
+User Selection
+↓
+Test Case Generator
+↓
+Structured Test Case JSON
+↓
+Application Preview
+```
+
+Clearly identify which steps use AI and which do not.
+
+AI should NOT be used for:
+
+* File validation.
+* TSV export.
+* Manual editing.
+* Delete operations.
+* Test Case ID generation where deterministic logic can be used.
+
+---
+
+# AI_RULES.md
+
+This document is critical.
+
+PRD is the source of truth.
+
+AI MAY:
+
+* Generate Positive cases.
+* Generate Negative cases.
+* Generate Edge cases.
+* Perform reasonable QA inference.
+* Test documented boundaries.
+* Connect related documented requirements.
+
+AI MUST NOT:
+
+* Invent business rules.
+* Invent permissions.
+* Invent roles.
+* Invent fields.
+* Invent API endpoints.
+* Invent HTTP methods.
+* Invent HTTP status codes.
+* Invent payload structures.
+* Invent limits.
+* Invent undocumented system behavior.
+
+Example:
+
+Requirement:
+
+`Password minimum 8 characters.`
+
+Allowed:
+
+* 7 characters.
+* Exactly 8 characters.
+* More than 8 characters.
+
+Not allowed:
+
+`Password maximum 50 characters`
+
+unless explicitly documented.
+
+Ambiguous requirements must be marked:
+
+`Need Confirmation`
+
+---
+
+# DEVELOPMENT_GUIDE.md
+
+Define development rules for all future coding agents.
+
+Mandatory rules:
+
+1. Read project documentation before making changes.
+2. PRD is the product source of truth.
+3. Do not implement out-of-scope features.
+4. Inspect existing implementation before editing.
+5. Prefer minimal scoped changes.
+6. Never rewrite unrelated working code.
+7. Preserve existing developer changes.
+8. Do not remove project configuration unless clearly obsolete and verified.
+9. Run relevant validation after changes.
+10. Report modified files.
+11. Report tests performed.
+12. Report known limitations.
+13. Do not silently introduce dependencies.
+14. Avoid unnecessary abstraction.
+15. Never expose AI API keys to the frontend.
+
+---
+
+# VERSIONING_RELEASE.md
+
+TestPilot AI uses Semantic Versioning:
+
+```text
+MAJOR.MINOR.PATCH
+```
+
+Examples:
+
+```text
+0.1.0
+0.1.1
+0.2.0
+1.0.0
+```
+
+Use Conventional Commits.
+
+Examples:
+
+```text
+feat: add PRD upload
+fix: handle invalid PDF
+docs: update PRD
+test: add parser tests
+refactor: simplify AI service
+chore: update dependencies
+```
+
+Expected version behavior:
+
+```text
+fix → PATCH
+feat → MINOR
+breaking change → MAJOR
+```
+
+Use Husky as a Git quality gate.
+
+Hooks may validate:
+
+* lint
+* typecheck
+* tests
+* commit message format
+
+Version must NOT automatically increase on every local push.
+
+Expected flow:
+
+```text
+Feature Branch
+→ Commit
+→ Husky Validation
+→ Push
+→ Pull Request
+→ Merge Main
+→ Automated Versioning
+→ Release
+```
+
+Document how the version can be referenced by QA for:
+
+* Test execution.
+* Bug reporting.
+* Regression.
+* Retesting.
+* Release tracking.
+
+---
+
+# QA DOCUMENTATION
+
+Testing documentation must be treated as a first-class project asset.
+
+Testing must cover both:
+
+* Functional behavior.
+* Quality and failure behavior.
+
+---
+
+# TEST_STRATEGY.md
+
+Define the overall QA strategy.
+
+Include:
+
+## Testing Levels
+
+* Unit testing.
+* Integration testing.
+* API testing.
+* Frontend functional testing.
+* End-to-end testing.
+* Regression testing.
+* AI output validation.
+* Error handling testing.
+
+## Test Types
+
+* Positive.
+* Negative.
+* Edge.
+* Validation.
+* Functional.
+* Integration.
+* Regression.
+* AI-specific testing.
+
+## Priority
+
+Define:
+
+* P0 / Critical path.
+* P1 / Important.
+* P2 / Secondary.
+
+---
+
+# TEST_PLAN.md
+
+Document what must be validated for the MVP.
+
+Minimum coverage:
+
+## PRD Upload
+
+* PDF.
+* DOCX.
+* TXT.
+* Empty file.
+* Unsupported extension.
+* Corrupt document.
+* No readable content.
+* Oversized file.
+
+## Language
+
+* Indonesian PRD.
+* English PRD.
+* Mixed Indonesian + English PRD.
+
+## PRD Analysis
+
+* Module detection.
+* Feature detection.
+* Requirement detection.
+* Validation detection.
+* Business rule detection.
+* Ambiguous requirement detection.
+
+## AI Guardrails
+
+Validate that AI does not invent:
+
+* Fields.
+* Roles.
+* Permissions.
+* Business rules.
+* API contracts.
+* Limits.
+* HTTP status codes.
+
+## Generation
+
+Validate:
+
+* Frontend.
+* Backend.
+* Both.
+* Positive cases.
+* Negative cases.
+* Edge cases.
+
+## Preview
+
+Validate:
+
+* Table rendering.
+* FE/BE separation.
+* Long text.
+* Large testcase counts.
+* Empty values.
+
+## Editing
+
+Validate:
+
+* Edit.
+* Save.
+* Cancel.
+* Data persistence during active session.
+
+## Delete
+
+Validate:
+
+* Delete testcase.
+* Other Test Case IDs do not change.
+
+## Export
+
+Validate:
+
+* TSV structure.
+* Selected columns only.
+* Column order.
+* Tab separation.
+* Special characters.
+* Newlines inside steps.
+* Indonesian text.
+* English text.
+* FE export.
+* BE export.
+* Both export.
+
+## AI Failure
+
+Validate:
+
+* API timeout.
+* Invalid JSON.
+* Rate limit.
+* Provider unavailable.
+* Empty AI response.
+* Partial AI response.
+
+---
+
+# TEST_CASE_GUIDE.md
+
+Use these schemas.
+
+## Frontend Test Case
+
+```text
+Test Case ID
+Module
+Feature
+Title
+Preconditions
+Steps
+Expected Result
+Priority
+Type
+Automation
+Notes
+```
+
+## Backend Test Case
+
+```text
+Test Case ID
+Module
+Feature
+Title
+Preconditions
+Steps
+Expected Result
+Priority
+Type
+Automation
+Notes
+```
+
+Rules:
+
+* Titles must be short and direct.
+* Expected Results must be concise.
+* Steps must be reproducible.
+* Positive, Negative, and Edge cases must be distinguishable.
+* Do not create duplicate cases.
+* Do not invent undocumented expected behavior.
+
+---
+
+# TEST_DATA_GUIDE.md
+
+Test Data is not a default Test Case column for the MVP.
+
+However, actual validation values should be documented where needed during execution or automation.
+
+Examples:
+
+```text
+Invalid email:
+user@
+
+Empty:
+""
+
+Whitespace:
+"   "
+
+Password below boundary:
+1234567
+
+Password boundary:
+12345678
+```
+
+Do not invent business-specific limits.
+
+---
+
+# BUG_REPORT_GUIDE.md
+
+Define a consistent bug format.
+
+Minimum fields:
+
+```text
+Bug ID
+Version
+Environment
+Module
+Feature
+Title
+Preconditions
+Steps to Reproduce
+Expected Result
+Actual Result
+Severity
+Priority
+Evidence
+Related Test Case
+Status
+Notes
+```
+
+Frontend and Backend bugs should be distinguishable.
+
+---
+
+# TRACEABILITY.md
+
+Define traceability:
+
+```text
+PRD
+↓
+Requirement
+↓
+Module / Feature
+↓
+Test Case
+↓
+Test Result
+↓
+Bug
+```
+
+The MVP does not need a full automated traceability system yet.
+
+The document exists so the architecture can support it later.
+
+---
+
+# RELEASE_CHECKLIST.md
+
+Before a release is considered QA-ready, check:
+
+* Lint passes.
+* Typecheck passes.
+* Automated tests pass.
+* Critical functional flow passes.
+* PRD upload works.
+* PRD analysis works.
+* FE generation works.
+* BE generation works.
+* Both generation works.
+* AI guardrails checked.
+* Edit/Delete works.
+* TSV export works.
+* Version is correct.
+* No exposed secrets.
+* No known P0 blockers.
+
+---
+
+# TEST CASE STORAGE
+
+Prepare directories:
+
+```text
+qa/test-cases/frontend/
+qa/test-cases/backend/
+```
+
+Do NOT fabricate actual test cases for features that have not yet been implemented or verified.
+
+Create test cases only when there is sufficient evidence from:
+
+* PRD.
+* Implemented behavior.
+* Approved technical specification.
+
+---
+
+# TEST EXECUTION STORAGE
+
+Prepare:
+
+```text
+qa/test-execution/frontend/
+qa/test-execution/backend/
+```
+
+Actual Result and Status must remain empty until execution is performed.
+
+Never fake execution results.
+
+---
+
+# BUG REPORT STORAGE
+
+Prepare:
+
+```text
+qa/bug-reports/frontend/
+qa/bug-reports/backend/
+```
+
+Do not create fictional bugs.
+
+Only document observed defects.
+
+---
+
+# AUTOMATION
+
+Prepare:
+
+```text
+qa/automation/
+```
+
+Do not implement full automation yet unless explicitly requested.
+
+Future automation should prioritize:
+
+1. P0 flows.
+2. File validation.
+3. PRD processing.
+4. AI response schema validation.
+5. TSV export.
+6. Regression-critical behavior.
+
+---
+
+# README.md
+
+Create/update the root README so a new developer or agent immediately understands:
+
+* What TestPilot AI is.
+* MVP scope.
+* Current project status.
+* Documentation locations.
+* How to run the application when implementation exists.
+* How to run validation/tests.
+* Versioning rules.
+* Contribution flow.
+
+Include a clear:
+
+`Read Documentation First`
+
+section.
+
+---
+
+# AGENT WORKFLOW
+
+All future agents should follow:
+
+```text
+READ DOCS
+↓
+UNDERSTAND CURRENT STATE
+↓
+CHECK MVP SCOPE
+↓
+INSPECT EXISTING CODE
+↓
+PLAN MINIMAL CHANGE
+↓
+IMPLEMENT
+↓
+RUN VALIDATION
+↓
+UPDATE RELEVANT DOCUMENTATION
+↓
+REPORT RESULTS
+```
+
+Documentation must evolve together with implementation.
+
+Do not allow implementation and documentation to silently diverge.
+
+---
+
+# IMPORTANT
+
+For this task:
+
+DO NOT build the TestPilot application yet.
+
+DO NOT add product features.
+
+DO NOT invent missing product behavior.
+
+Only:
+
+1. Inspect existing repository if present.
+2. Create/organize documentation structure.
+3. Populate documentation from the approved PRD and Business Flow.
+4. Document engineering and QA rules.
+5. Report all created or modified files.
+6. Report any unresolved questions.

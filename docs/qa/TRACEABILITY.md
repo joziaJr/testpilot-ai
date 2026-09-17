@@ -1,0 +1,59 @@
+# Traceability
+
+## Purpose and scope
+
+Maintain a lightweight evidence chain:
+
+```text
+PRD → Requirement → Module / Feature → Test Case → Test Result → Bug
+```
+
+This is a repository documentation convention. The MVP does not include a full automated traceability system, coverage dashboard, or user-facing PRD-reference-per-case feature; the latter is a post-MVP candidate in PRD §32. Minimal internal references may support grounding without adding default case columns or UI features.
+
+## Source identity
+
+The approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md) remain unchanged, version 1.0 Draft / Approved Baseline for Development. Cite section/BR identifiers plus applicable [resolved OQ-03–OQ-14](../product/OPEN_QUESTIONS.md). The register retains original question subjects, decisions, status, rationale, owner/date, affected docs, and verbatim approval. Document version is not application version.
+
+For future uploaded-source fixtures, record a stable fixture revision/checksum and source location. A requirement reference must resolve to actual source content; inferred QA scenarios must remain distinguishable from explicit product rules.
+
+## Baseline coverage mapping
+
+This maps approved requirements to planned coverage, not to executed cases. Case/result/bug references are intentionally absent until real artifacts exist. The [Test Plan](TEST_PLAN.md) and [Release Checklist](RELEASE_CHECKLIST.md) contain the corresponding checks.
+
+| Source                              | Behavior                                                                             | Planned coverage                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
+| PRD §§5, 27; Business Flow §3       | PDF/DOCX/TXT validation, extraction, invalid-file recovery                           | Upload formats/failures, no OCR, Upload Again                                                       |
+| PRD §6; BR-07                       | Same/dominant language output, fixed headers/enums                                   | Indonesian/English/mixed language and structured-value checks                                       |
+| PRD §§7–8, 24, 28                   | Analysis, language display, module/feature review and selection                      | Detection, selected-scope generation, three-screen responsibilities                                 |
+| PRD §§9–13; BR-01/BR-03/BR-04/BR-06 | FE/BE semantics, inference, no invented rules/contracts, ambiguity                   | Layer-specific generation, guardrails, `Need Confirmation`, permitted whitespace/boundary inference |
+| PRD §14                             | Coverage-based quantity, no manual count or redundancy                               | Quantity and duplicate-scenario review                                                              |
+| PRD §§15–17                         | Eleven columns, automatic unique immutable IDs, structured output                    | Schema/enums/steps validation and deterministic ID checks                                           |
+| PRD §§18–20; BR-02/BR-05            | Review before export, split tabs, non-ID editing, deletion                           | Preview, Save/Cancel from bootstrap plan, stable IDs, QA control                                    |
+| PRD §§21–23; BR-05                  | Selected columns, preserved preview data, separate named TSVs                        | Export selection/order, TSV content, Excel/Sheets use, FE/BE/Both                                   |
+| PRD §25                             | Configurable initial free-tier provider, no provider UI                              | Adapter/configuration checks                                                                        |
+| PRD §26                             | Available usage metadata for every AI request                                        | Actions/model/tokens/timestamp checks                                                               |
+| PRD §§27, 33                        | Handled errors, no crash, retry path, loading, usable large preview                  | Failure/recovery/responsiveness checks                                                              |
+| PRD §29                             | Active-session generation data                                                       | Metadata/requirements/language/selection/FE/BE/edit state checks                                    |
+| PRD §30                             | Versioning, commits, hooks/CI, post-main release automation                          | Release gates and version identity                                                                  |
+| PRD §§31–32; Business Flow §15      | MVP boundaries and post-MVP candidates                                               | Scope review against [MVP Scope](../product/MVP_SCOPE.md)                                           |
+| PRD §33                             | Server-only secrets, non-public uploads, modular responsibilities                    | Security/configuration and architecture review                                                      |
+| PRD §34                             | Full Definition of Done                                                              | Release checklist plus all mapped coverage above                                                    |
+| PRD §35; BR-02                      | QA retains judgment and final approval                                               | Review flow and human acceptance of generated cases                                                 |
+| OQ-03–OQ-06                         | File policy, language fallback, ambiguity/empty selection, session lifecycle         | Test Plan upload/language/selection/session checks                                                  |
+| OQ-07–OQ-10                         | Export defaults/order/empty layers, TSV safety, field/ID rules, analysis uncertainty | Test Plan export/schema/IDs and AI Evaluation uncertainty                                           |
+| OQ-11–OQ-14                         | Stack/provider/usage, retries/partial output, privacy, release tooling               | Test Plan operational/security/release; Security Testing; Release Checklist                         |
+
+## Artifact linking convention
+
+| Artifact           | References to retain                                                                        |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| Case specification | Source revision/section, module/feature, stable case ID, layer                              |
+| Execution record   | Case ID/revision, build/version/environment, fixture, actual result/status after execution  |
+| Bug report         | Observed build, source-backed expectation, related case/execution, evidence, retest history |
+| Release evidence   | Candidate version/commit, execution set, unresolved defects, decision and owner             |
+
+Keep repository traceability in context/Notes without adding default case columns. Need Confirmation remains analysis metadata, not an added traceability/export column. Since IDs may restart in a new session, identify generated-case references by session plus layer/ID as well as source revision. Planned execution Actual Result and Status stay empty; do not manufacture result/bug links.
+
+## Change maintenance
+
+On a source change, identify affected modules/features and case specifications, preserve old evidence, and plan relevant regression. On implementation changes, update related docs and tests without retroactively changing source intent. On a failed execution, link the actual defect. On retest, append the new build/result and link the original observation. Handle these steps manually until a separate scope decision authorizes automation.

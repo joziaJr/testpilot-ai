@@ -1,6 +1,6 @@
 # Agent instructions
 
-The repository contains M0 and M1 upload validation. See docs/engineering/M1_UPLOAD.md for implemented behavior and limitations. Document extraction, AI analysis and later product features must be introduced only by their approved milestone, within MVP scope.
+The repository contains M0, M1 upload validation and M2 document extraction. See docs/engineering/M1_UPLOAD.md and docs/engineering/M2_EXTRACTION.md for implemented behavior and limitations. AI analysis and later product features must be introduced only by their approved milestone, within MVP scope.
 
 ## Required workflow
 

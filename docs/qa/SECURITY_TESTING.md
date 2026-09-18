@@ -4,7 +4,7 @@
 
 Prepare future validation against [PRD §33](../product/PRD.md) and [resolved OQ-03/OQ-06/OQ-08/OQ-11–OQ-13](../product/OPEN_QUESTIONS.md). Upload limits, session isolation, transient-only raw retention, server secrets, formula safety, strict JSON, and retry/duplicate prevention are settled. Additional tests assess real implementation safeguards, not accounts, roles, or new product features. No security execution or findings are claimed.
 
-M1 upload safeguards have automated tests documented in [M1 Upload](../engineering/M1_UPLOAD.md). Extraction/parser boundaries and the full MVP coverage below remain planned. Use only owned/authorized test environments and synthetic data during future execution; external provider infrastructure is outside the target unless separately authorized. Detailed execution prerequisites are in [Penetration Testing Plan](PENETRATION_TEST_PLAN.md).
+M1 upload safeguards and M2 extraction/parser boundaries have automated tests documented in [M1 Upload](../engineering/M1_UPLOAD.md) and [M2 Extraction](../engineering/M2_EXTRACTION.md). The full MVP coverage below remains the broader plan. Use only owned/authorized test environments and synthetic data during future execution; external provider infrastructure is outside the target unless separately authorized. Detailed execution prerequisites are in [Penetration Testing Plan](PENETRATION_TEST_PLAN.md).
 
 ## Separate evaluation categories
 
@@ -36,7 +36,7 @@ M1 upload safeguards have automated tests documented in [M1 Upload](../engineeri
 | TSV / spreadsheet formula injection | Formula-leading =, +, -, @ and leading-whitespace variants become literal text under the chosen deterministic strategy; normalize tabs/newlines, single-cell steps, UTF-8 BOM/CRLF/TAB; verify Excel/Sheets with synthetic input |
 | Dependency vulnerabilities          | Inventory selected parsers/provider SDK/runtime dependencies; assess relevant advisories with actual versions and exposure once dependencies exist                                                                               |
 
-No unresolved MVP-blocking Open Questions remain. OQ-03 fixes the 10 MB maximum; OQ-12 fixes duplicate/retry/partial policies with centralized configurable resource limits; OQ-13 fixes privacy/retention; OQ-08 fixes safe TSV behavior. Actual server rate-control mechanics, parser/model choice, and sanitization implementation are engineering choices to document and test. Run the audit after selecting each dependency and report its actual result separately. This strategy is planning and defensive automation, not penetration testing or malware analysis.
+No unresolved MVP-blocking Open Questions remain. OQ-03 fixes the 10 MB maximum; OQ-12 fixes duplicate/retry/partial policies with centralized configurable resource limits; OQ-13 fixes privacy/retention; OQ-08 fixes safe TSV behavior. Actual server rate-control mechanics, parser/model choice, and sanitization implementation are engineering choices to document and test. Dependencies are installed; run the audit for each candidate and report its actual result separately. M2 reviews PDF.js and Mammoth, rejects vulnerable Mammoth 1.10.0, pins patched 1.11.0, bounds DOCX worker resources, and covers malformed/textless files. This is defensive automation, not penetration testing or malware analysis.
 
 ## Planned AI security coverage
 

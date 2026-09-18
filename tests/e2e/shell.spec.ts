@@ -1,7 +1,8 @@
-import { expect, test } from "@playwright/test";
+﻿import { expect, test } from "@playwright/test";
 import path from "node:path";
-
 const fixture = (name: string) => path.resolve("qa/test-data/m1", name);
+const extractionFixture = (name: string) =>
+  path.resolve("qa/test-data/m2", name);
 
 test("upload interface is accessible on a narrow viewport", async ({
   page,
@@ -19,7 +20,6 @@ test("upload interface is accessible on a narrow viewport", async ({
     ),
   ).toBe(true);
 });
-
 for (const ext of ["pdf", "docx", "txt"]) {
   test(`accepts ${ext} via file picker and removes it`, async ({ page }) => {
     await page.goto("/");
@@ -34,13 +34,13 @@ for (const ext of ["pdf", "docx", "txt"]) {
     await expect(
       page.getByText(`requirements.${ext}`, { exact: true }),
     ).toBeVisible();
+    await expect(page.getByText(/Extraction: COMPLETE/)).toBeVisible();
     await page.getByRole("button", { name: "Remove file" }).click();
     await expect(page.getByText("File accepted", { exact: true })).toHaveCount(
       0,
     );
   });
 }
-
 test("rejects invalid input, recovers, and preserves the previous file on failed replacement", async ({
   page,
 }) => {
@@ -71,7 +71,6 @@ test("rejects invalid input, recovers, and preserves the previous file on failed
   ).toBeVisible();
   await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
 });
-
 test("supports drop and rejects multiple dropped files", async ({ page }) => {
   await page.goto("/");
   const transfer = await page.evaluateHandle(() => {
@@ -95,7 +94,6 @@ test("supports drop and rejects multiple dropped files", async ({ page }) => {
     "Choose one PRD file",
   );
 });
-
 test("renders hostile filenames as text", async ({ page }) => {
   await page.goto("/");
   const name = "<img src=x onerror=alert(1)>.txt";
@@ -107,7 +105,29 @@ test("renders hostile filenames as text", async ({ page }) => {
   await expect(page.getByText(name, { exact: true })).toBeVisible();
   await expect(page.locator("img")).toHaveCount(0);
 });
-
+test("shows validation success separately from unreadable extraction and recovers", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const input = page.getByLabel("Choose PRD file");
+  await input.setInputFiles(extractionFixture("image-only.pdf"));
+  await expect(
+    page.getByText("Validation: PASS", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Extraction: FAILED — No readable text found.",
+  );
+  await input.setInputFiles(extractionFixture("requirements.txt"));
+  await expect(page.getByText(/Extraction: COMPLETE/)).toBeVisible();
+  await expect(
+    page.getByText("requirements.txt", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Remove file" }).click();
+  await expect(page.getByText("Validation: PASS", { exact: true })).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(/Extraction:/)).toHaveCount(0);
+});
 test("a removed selection cannot be restored by a late replacement response", async ({
   page,
 }) => {
@@ -138,5 +158,37 @@ test("a removed selection cannot be restored by a late replacement response", as
   release();
   await page.unrouteAll({ behavior: "wait" });
   await expect(page.getByText("File accepted", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
+});
+test("a removed selection cannot be restored by a late extraction response", async ({
+  page,
+}) => {
+  await page.goto("/");
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let started!: () => void;
+  const intercepted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  await page.route("**/api/documents/extract", async (route) => {
+    const response = await route.fetch();
+    started();
+    await gate;
+    await route.fulfill({ response });
+  });
+  await page
+    .getByLabel("Choose PRD file")
+    .setInputFiles(extractionFixture("requirements.pdf"));
+  await intercepted;
+  await expect(
+    page.getByText("Extraction: IN PROGRESS", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Remove file" }).click();
+  release();
+  await page.unrouteAll({ behavior: "wait" });
+  await expect(page.getByText("File accepted", { exact: true })).toHaveCount(0);
+  await expect(page.getByText(/Extraction:/)).toHaveCount(0);
   await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
 });

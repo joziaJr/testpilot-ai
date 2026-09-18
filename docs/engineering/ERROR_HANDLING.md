@@ -56,3 +56,7 @@ Use controlled fixtures or provider mocks to reproduce failures, with actual evi
 ## M1 implementation
 
 M1 now has a concrete upload endpoint and safe error catalog: see [M1 Upload](M1_UPLOAD.md). Readability/no-text/encryption detection requiring full parsing remains M2; upload acceptance is not extraction success.
+
+## M2 implementation
+
+M2 now separates validation errors from typed extraction errors. `EMPTY_DOCUMENT`, `UNREADABLE_DOCUMENT`, `MALFORMED_DOCUMENT`, and `EXTRACTION_FAILED` map parser/decoder/resource failures to fixed user-safe messages. Validation-pass/extraction-fail returns 422 metadata without extracted text or raw exceptions. See [M2 Extraction](M2_EXTRACTION.md).

@@ -19,8 +19,9 @@ export default function Home() {
             Upload your PRD
           </h1>
           <p className="mt-5 max-w-xl leading-7 text-[var(--muted)]">
-            Choose your product requirements document. We’ll validate its format
-            and size before any later processing begins.
+            Choose your product requirements document. We’ll validate the file
+            and extract its readable text so you can start with the right
+            source.
           </p>
           <PrdUpload {...getUploadPolicy()} />
         </section>

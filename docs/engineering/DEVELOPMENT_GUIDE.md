@@ -2,7 +2,7 @@
 
 ## Current foundation
 
-M0 implements the toolchain at version `0.1.0`; M1 implements PRD upload validation. See [M1 Upload](M1_UPLOAD.md). Document extraction, AI and later workflows remain unimplemented. Inspect manifests, lockfile, status and documentation before later milestone work.
+M0 implements the toolchain at version `0.1.0`; M1 implements PRD upload validation; M2 implements deterministic document extraction. See [M1 Upload](M1_UPLOAD.md) and [M2 Extraction](M2_EXTRACTION.md). AI and later workflows remain unimplemented. Inspect manifests, lockfile, status and documentation before later milestone work.
 
 ## Mandatory rules
 

@@ -61,3 +61,7 @@ On a source change, identify affected modules/features and case specifications, 
 ## M1 implementation
 
 PRD sections 5/27/33, Business Flow section 3 and OQ-03/OQ-06/OQ-13 map to [M1 FE specifications](../../qa/test-cases/frontend/M1_UPLOAD.md) and [M1 BE specifications](../../qa/test-cases/backend/M1_UPLOAD.md). Notes link each case to actual automated tests. See [M1 Upload](../engineering/M1_UPLOAD.md) for implemented versus deferred scope. No manual result or bug links are manufactured.
+
+## M2 implementation
+
+PRD sections 5/24.1/27/31/33/34, Business Flow section 3 and OQ-03/OQ-11/OQ-13 map to Document Extraction, [M2 FE specifications](../../qa/test-cases/frontend/M2_EXTRACTION.md), [M2 BE specifications](../../qa/test-cases/backend/M2_EXTRACTION.md), and named unit/integration/E2E tests in their Notes. [M2 Extraction](../engineering/M2_EXTRACTION.md) defines the implemented contract and exclusions. No M3 analysis coverage, manual result or bug link is claimed.

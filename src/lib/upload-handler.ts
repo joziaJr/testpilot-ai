@@ -3,22 +3,43 @@ import {
   uploadMessages,
   validateFileBytes,
   validateMetadata,
+  type UploadExtension,
   type UploadErrorCode,
 } from "./upload-validation";
 
+// Multipart headers/boundary overhead is separate from the file's product limit.
 export const MULTIPART_OVERHEAD_BYTES = 64 * 1024;
 export const UPLOAD_TIMEOUT_MS = 30_000;
 
 function reject(code: UploadErrorCode, status = 400) {
   return Response.json(
     { error: { code, message: uploadMessages[code] } },
-    { status, headers: { "Cache-Control": "no-store" } },
+    {
+      status,
+      headers: { "Cache-Control": "no-store" },
+    },
+  );
+}
+
+export type ValidatedUpload = {
+  file: File;
+  bytes: Uint8Array;
+  extension: UploadExtension;
+};
+
+type AcceptedUploadHandler = (upload: ValidatedUpload) => Promise<Response>;
+
+async function uploadAccepted({ file, extension }: ValidatedUpload) {
+  return Response.json(
+    { file: { name: file.name, size: file.size, extension } },
+    { headers: { "Cache-Control": "no-store" } },
   );
 }
 
 export async function handleUpload(
   request: Request,
   maxBytes: number,
+  onAccepted: AcceptedUploadHandler = uploadAccepted,
 ): Promise<Response> {
   const contentType = request.headers.get("content-type") ?? "";
   if (!/^multipart\/form-data\s*;/i.test(contentType) || !request.body)
@@ -68,10 +89,7 @@ export async function handleUpload(
     const error =
       validateMetadata(file, maxBytes) ?? validateFileBytes(bytes, extension);
     if (error) return reject(error, error === "TOO_LARGE" ? 413 : 400);
-    return Response.json(
-      { file: { name: file.name, size: file.size, extension } },
-      { headers: { "Cache-Control": "no-store" } },
-    );
+    return onAccepted({ file, bytes, extension });
   } catch {
     return reject("INVALID_REQUEST");
   } finally {

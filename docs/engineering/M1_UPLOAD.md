@@ -2,7 +2,7 @@
 
 ## Implemented boundary
 
-Sources: PRD sections 5, 27 and 33; Business Flow section 3; resolved OQ-03, OQ-06 and OQ-13. M1 implements upload validation only. Acceptance does not certify document readability, safe content, or extraction success. The later M2 extraction boundary will perform parser/readability checks after M1 acceptance. No extraction, OCR, AI, generation, preview, export, or persistence runs inside the M1 endpoint.
+Sources: PRD sections 5, 27 and 33; Business Flow section 3; resolved OQ-03, OQ-06 and OQ-13. M1 implements upload validation only. Acceptance does not certify document readability, safe content, or extraction success. The later [M2 extraction boundary](M2_EXTRACTION.md) performs parser/readability checks after M1 acceptance. No extraction, OCR, AI, generation, preview, export, or persistence runs inside the M1 endpoint.
 
 ## User flow
 
@@ -39,7 +39,7 @@ Network/unusable-response failures use the client-only UPLOAD_FAILED message. Cl
 - Nonempty name/file, inclusive configured size boundary, case-insensitive final extension; no invented filename-length rule. Spaces and multiple dots are supported.
 - Recognized MIME must match the extension: application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document, text/plain. Empty MIME and application/octet-stream are treated as unspecified and still require byte checks. Other MIME values are rejected.
 - PDF: starts with a PDF version signature and ends with an EOF marker (within the last 1,024 bytes). This is signature validation, not a PDF parser.
-- DOCX: ZIP local and central-directory structure, matching entry names and bounded offsets, no duplicate names, no multi-disk/encrypted central entries; required [Content_Types].xml, _rels/.rels, word/document.xml entries. No decompression, XML processing, CRC verification, relationship resolution or content extraction. A crafted container can pass M1; M2 will apply its dedicated parser and resource boundary.
+- DOCX: ZIP local and central-directory structure, matching entry names and bounded offsets, no duplicate names, no multi-disk/encrypted central entries; required [Content_Types].xml, _rels/.rels, word/document.xml entries. No decompression, XML processing, CRC verification, relationship resolution or content extraction. A crafted container can pass M1; [M2](M2_EXTRACTION.md) applies its dedicated parser and resource boundary.
 - TXT: strict UTF-8 including optional BOM, rejecting binary control bytes except tab/CR/LF and recognizable PDF/ZIP signatures renamed to TXT. No requirements extraction, semantic validation or whitespace-only readability judgment.
 
 ## Security and remaining limits

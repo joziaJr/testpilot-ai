@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  extractionErrorMessages,
+  type ExtractionErrorCode,
+} from "@/lib/extraction/extraction-errors";
+import {
   extensionOf,
   uploadMessages,
   validateMetadata,
@@ -10,7 +14,13 @@ import {
   type UploadErrorCode,
 } from "@/lib/upload-validation";
 
-type SelectedDocument = FileMetadata & { fileType: UploadExtension };
+type SelectedDocument = FileMetadata & {
+  fileType: UploadExtension;
+  extraction:
+    | { status: "extracting" }
+    | { status: "success"; characterCount: number }
+    | { status: "failed"; code: ExtractionErrorCode; message: string };
+};
 
 export function PrdUpload({
   maxSizeMB,
@@ -27,13 +37,14 @@ export function PrdUpload({
   const request = useRef<AbortController | null>(null);
   const revision = useRef(0);
   const lifecycle = useRef(0);
-
   useEffect(() => {
     const lifecycleRef = lifecycle;
     const revisionRef = revision;
     const requestRef = request;
     const currentLifecycle = ++lifecycleRef.current;
     return () => {
+      // Strict Mode immediately sets the effect up again. Only a real unmount
+      // should cancel an upload that started during hydration.
       queueMicrotask(() => {
         if (lifecycleRef.current === currentLifecycle) {
           revisionRef.current++;
@@ -66,7 +77,9 @@ export function PrdUpload({
     const controller = new AbortController();
     request.current = controller;
     setBusy(true);
-    const timeout = setTimeout(() => controller.abort(), 30_000);
+    const timeout = setTimeout(() => controller.abort(), 60_000);
+    const fileType = extensionOf(file.name)!;
+    let validationPassed = false;
     try {
       const body = new FormData();
       body.set("file", file);
@@ -88,14 +101,85 @@ export function PrdUpload({
       }
       if (result.file?.name !== file.name || result.file?.size !== file.size)
         throw new Error("Invalid upload response");
+      validationPassed = true;
       setSelected({
         name: file.name,
         size: file.size,
         type: file.type,
-        fileType: extensionOf(file.name)!,
+        fileType,
+        extraction: { status: "extracting" },
+      });
+      setBusy(false);
+
+      const extractionBody = new FormData();
+      extractionBody.set("file", file);
+      const extractionResponse = await fetch("/api/documents/extract", {
+        method: "POST",
+        body: extractionBody,
+        signal: controller.signal,
+      });
+      const extractionResult = await extractionResponse.json();
+      if (id !== revision.current) return;
+      const extraction = extractionResult.extraction;
+      if (
+        extractionResult.validation?.status !== "passed" ||
+        extraction?.fileName !== file.name ||
+        extraction?.fileType !== fileType
+      )
+        throw new Error("Invalid extraction response");
+      if (
+        extractionResponse.ok &&
+        extraction.status === "success" &&
+        Number.isSafeInteger(extraction.characterCount) &&
+        extraction.characterCount > 0
+      ) {
+        setSelected({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          fileType,
+          extraction: {
+            status: "success",
+            characterCount: extraction.characterCount,
+          },
+        });
+        return;
+      }
+      const code = extraction.error?.code as ExtractionErrorCode;
+      if (
+        extraction.status !== "failed" ||
+        !Object.hasOwn(extractionErrorMessages, code)
+      )
+        throw new Error("Invalid extraction failure response");
+      setSelected({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        fileType,
+        extraction: {
+          status: "failed",
+          code,
+          message: extractionErrorMessages[code],
+        },
       });
     } catch {
-      if (id === revision.current) setError(uploadMessages.UPLOAD_FAILED);
+      if (id === revision.current) {
+        if (validationPassed) {
+          setSelected({
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            fileType,
+            extraction: {
+              status: "failed",
+              code: "EXTRACTION_FAILED",
+              message: extractionErrorMessages.EXTRACTION_FAILED,
+            },
+          });
+        } else {
+          setError(uploadMessages.UPLOAD_FAILED);
+        }
+      }
     } finally {
       clearTimeout(timeout);
       if (id === revision.current) setBusy(false);
@@ -162,6 +246,21 @@ export function PrdUpload({
               {selected.size.toLocaleString("en-US")} bytes ·{" "}
               {selected.fileType.toUpperCase()}
             </p>
+            <p className="mt-2 text-sm font-medium text-emerald-800">
+              Validation: PASS
+            </p>
+            {selected.extraction.status === "extracting" && (
+              <p className="mt-2 text-sm text-[var(--muted)]">
+                Extraction: IN PROGRESS
+              </p>
+            )}
+            {selected.extraction.status === "success" && (
+              <p className="mt-2 text-sm text-emerald-800">
+                Extraction: COMPLETE ·{" "}
+                {selected.extraction.characterCount.toLocaleString("en-US")}{" "}
+                characters
+              </p>
+            )}
             <button
               type="button"
               className="mt-4 rounded px-2 py-1 text-sm font-semibold underline underline-offset-4"
@@ -176,6 +275,14 @@ export function PrdUpload({
           </div>
         )}
       </div>
+      {selected?.extraction.status === "failed" && (
+        <p
+          role="alert"
+          className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+        >
+          Extraction: FAILED — {selected.extraction.message}
+        </p>
+      )}
       {error && (
         <p
           role="alert"

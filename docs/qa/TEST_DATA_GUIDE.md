@@ -48,3 +48,7 @@ Store files and their documentation under [qa/test-data](../../qa/test-data/). U
 ## M1 implementation
 
 M1 synthetic fixtures and deliberate mutations are described in [the fixture manifest](../../qa/test-data/m1/README.md). These are real local files; later parser/AI fixture categories above remain planned.
+
+## M2 implementation
+
+M2 deterministic PDF/DOCX/TXT fixtures, deliberate malformed/textless variants, generation instructions and checksums are recorded in the [M2 fixture manifest](../../qa/test-data/m2/README.md). Language and normalization strings are also created in memory by unit tests. Fixtures establish parser expectations only, not AI semantic or case-generation oracles.

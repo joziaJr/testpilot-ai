@@ -43,3 +43,7 @@ Use [Security Testing Strategy](../qa/SECURITY_TESTING.md) for conventional and 
 ## M1 implementation
 
 M1 implements bounded request-local upload validation, no storage/logging of document bodies, escaped filename rendering and request cancellation. See [M1 Upload](M1_UPLOAD.md) for exact signature checks and remaining resource/parser risks. No penetration testing has been executed.
+
+## M2 implementation
+
+M2 keeps parsing server-side and in memory after repeated M1 validation. Client responses omit extracted text; logs omit raw content, paths and parser exceptions. PDF.js performs text extraction without OCR/rendering/external resource configuration. Mammoth 1.11.0 runs in a bounded worker after archive expansion checks; version 1.10.0 was rejected due to its directory-traversal advisory. Exact resource limits and residual parser/DoS risks are documented in [M2 Extraction](M2_EXTRACTION.md). No penetration testing or malware scanning was performed.

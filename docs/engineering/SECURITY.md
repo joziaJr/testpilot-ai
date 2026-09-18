@@ -39,3 +39,11 @@ Keep unrelated anonymous sessions isolated. Preserve navigation data, prefer ref
 Authentication, roles, permission management, and collaboration are not MVP features. M0 adds ignored secret files, a blank-key example, server-only configuration validation, minimal dependencies, and disabled framework identification headers. A local dependency audit found no known vulnerabilities at M0 completion. This is not penetration testing or a security clearance; future validation must cover credential exposure, unsafe rendering, file handling, prompt injection, session isolation, and export hazards, with observed findings recorded through [Bug Report Guide](../qa/BUG_REPORT_GUIDE.md).
 
 Use [Security Testing Strategy](../qa/SECURITY_TESTING.md) for conventional and AI-security coverage, including rate/resource abuse, dependency review, and disclosure attempts. The [Penetration Testing Plan](../qa/PENETRATION_TEST_PLAN.md) defines future execution scope, prerequisites, evidence, stop conditions, and retesting. Both are preparation only.
+
+## M1 implementation
+
+M1 implements bounded request-local upload validation, no storage/logging of document bodies, escaped filename rendering and request cancellation. See [M1 Upload](M1_UPLOAD.md) for exact signature checks and remaining resource/parser risks. No penetration testing has been executed.
+
+## M2 implementation
+
+M2 keeps parsing server-side and in memory after repeated M1 validation. Client responses omit extracted text; logs omit raw content, paths and parser exceptions. PDF.js performs text extraction without OCR/rendering/external resource configuration. Mammoth 1.11.0 runs in a bounded worker after archive expansion checks; version 1.10.0 was rejected due to its directory-traversal advisory. Exact resource limits and residual parser/DoS risks are documented in [M2 Extraction](M2_EXTRACTION.md). No penetration testing or malware scanning was performed.

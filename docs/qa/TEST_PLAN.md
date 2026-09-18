@@ -2,7 +2,7 @@
 
 ## Purpose and evidence status
 
-This planned business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the test runners, a real environment-schema unit test, and an application-shell smoke test; none of the product coverage rows below has been executed or implemented. No Actual Result or execution Status is assigned to those future cases.
+This business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the runners; M1 adds upload validation; M2 adds TXT/PDF/DOCX extraction, normalization, server integration and browser coverage. The inventory below describes the full MVP, with implemented details in [M1 Upload](../engineering/M1_UPLOAD.md) and [M2 Extraction](../engineering/M2_EXTRACTION.md). No Actual Result or execution Status is assigned to unexecuted cases.
 
 Turn planning items into cases only with source-backed expectations. The [approved OQ-03–OQ-14 decisions](../product/OPEN_QUESTIONS.md) now provide upload, language, eligibility, session, schema, TSV, retry, privacy, and release oracles. No unresolved MVP-blocking Open Questions remain. TestPilot's 10 MB limit must not be inferred for another uploaded target PRD.
 
@@ -62,4 +62,4 @@ For long content/counts, record actual dimensions and usability observations; no
 
 ## Completion criteria and current limitations
 
-Coverage is complete only when required behavior has sourced expectations, cases, actual execution evidence, and reviewed results. Release-critical failures and unanswered acceptance questions must be resolved before claiming QA readiness. Sources are now available; remaining limitations are no implementation, fixtures, actual case suite, execution records, bugs, configured tools, or tested release. See [Traceability](TRACEABILITY.md) for source-to-coverage mappings. This document supplies planning coverage only.
+Coverage is complete only when required behavior has sourced expectations, cases, actual execution evidence, and reviewed results. Release-critical failures and unanswered acceptance questions must be resolved before claiming QA readiness. M1 upload and M2 extraction specifications, fixtures and automation exist; AI analysis and later workflow coverage remain future work. No manual execution or release clearance is implied. See [Traceability](TRACEABILITY.md) for source-to-coverage mappings.

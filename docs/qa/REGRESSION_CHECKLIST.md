@@ -30,4 +30,4 @@ Plan repeat validation after changes. This checklist is unexecuted and contains 
 - [ ] Resolved OQ-03–OQ-14 behavior preserved; any genuinely new blocker is explicitly recorded before declaring affected behavior passed.
 - [ ] Release evidence updated for the exact tested candidate.
 
-Leave all boxes unchecked until the corresponding work is performed. For unexecuted case records, Actual Result and Status remain empty. Review the [Test Strategy](TEST_STRATEGY.md), [AI Evaluation Strategy](AI_EVALUATION_STRATEGY.md), [Security Testing](SECURITY_TESTING.md), and [Release Checklist](RELEASE_CHECKLIST.md). No regression suite is implemented by this foundation.
+Leave all boxes unchecked until the corresponding work is performed. For unexecuted case records, Actual Result and Status remain empty. Review the [Test Strategy](TEST_STRATEGY.md), [AI Evaluation Strategy](AI_EVALUATION_STRATEGY.md), [Security Testing](SECURITY_TESTING.md), and [Release Checklist](RELEASE_CHECKLIST.md). M1 upload and M2 extraction regression run via `npm run check` and `npm run test:e2e`; later-stage rows remain planned.

@@ -52,3 +52,11 @@ Allow at most **1 automatic retry** for transient network/provider failures, inc
 ## QA and defect reporting
 
 Use controlled fixtures or provider mocks to reproduce failures, with actual evidence recorded under [test execution](../../qa/test-execution/) and observed defects under [bug reports](../../qa/bug-reports/). Record the version and failing stage. Never include a real API key or confidential PRD in diagnostics or repository evidence. See [Security](SECURITY.md) and [Test Plan](../qa/TEST_PLAN.md).
+
+## M1 implementation
+
+M1 now has a concrete upload endpoint and safe error catalog: see [M1 Upload](M1_UPLOAD.md). Readability/no-text/encryption detection requiring full parsing remains M2; upload acceptance is not extraction success.
+
+## M2 implementation
+
+M2 now separates validation errors from typed extraction errors. `EMPTY_DOCUMENT`, `UNREADABLE_DOCUMENT`, `MALFORMED_DOCUMENT`, and `EXTRACTION_FAILED` map parser/decoder/resource failures to fixed user-safe messages. Validation-pass/extraction-fail returns 422 metadata without extracted text or raw exceptions. See [M2 Extraction](M2_EXTRACTION.md).

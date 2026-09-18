@@ -1,6 +1,6 @@
 # Agent instructions
 
-The repository contains the M0 technical foundation. Product features remain unimplemented and must be introduced only by their approved milestone, within MVP scope.
+The repository contains M0 and M1 upload validation. See docs/engineering/M1_UPLOAD.md for implemented behavior and limitations. Document extraction, AI analysis and later product features must be introduced only by their approved milestone, within MVP scope.
 
 ## Required workflow
 

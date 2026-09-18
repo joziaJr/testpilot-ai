@@ -43,3 +43,7 @@ The server environment schema validates `AI_PROVIDER`, `AI_MODEL`, `AI_API_KEY`,
 7. Update [README](../../README.md) so a new developer can follow the verified setup.
 
 Do not claim a free tier is unlimited. Select and document provider/model privacy and retention only when provider integration is authorized. M0 validates configuration shape without making network calls or storing source content.
+
+## M1 implementation
+
+M1 defaults MAX_UPLOAD_SIZE_MB to 10 and AI_MAX_AUTOMATIC_RETRIES to 1 when absent. Invalid configured values still fail validation. No new variables or AI credentials are required. Decimal size conversion, request overhead and deadlines are documented in [M1 Upload](M1_UPLOAD.md).

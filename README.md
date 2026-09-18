@@ -4,7 +4,7 @@ TestPilot AI is an MVP for turning a PRD into reviewable Frontend (FE) and Backe
 
 ## Current project status
 
-M0 establishes the application and quality foundation at version `0.1.0`: Next.js, TypeScript, Tailwind CSS, shadcn/ui conventions, Zod configuration validation, Vitest, Playwright, Husky, Commitlint, GitHub Actions, and Release Please. The application is an intentionally inert shell; product workflows start in later milestones.
+M0 establishes the application and quality foundation at version `0.1.0`. M1 implements PRD upload and server-authoritative validation. See [M1 Upload](docs/engineering/M1_UPLOAD.md) for the actual contract and limits. Document extraction and AI remain unimplemented.
 
 The [PRD](docs/product/PRD.md) and [Business Flow](docs/product/BUSINESS_FLOW.md), both labeled **1.0 Draft / Approved Baseline for Development**, remain authoritative and unchanged. The [approved decisions OQ-03–OQ-14](docs/product/OPEN_QUESTIONS.md) clarify the implementation baseline. All twelve are resolved; their original subjects, final decisions, approval source, and affected docs remain traceable. The older task brief is historical context only.
 
@@ -32,11 +32,11 @@ Accounts, collaboration, project/history management, Jira/GitHub product integra
 | [docs/product](docs/product/)                                                                     | Product authority, flow, scope, source gaps                           |
 | [docs/engineering](docs/engineering/)                                                             | Implementation recommendations and agent rules                        |
 | [docs/qa](docs/qa/)                                                                               | Strategy, plan, case/data/bug standards, traceability, release checks |
-| [qa/test-cases/frontend](qa/test-cases/frontend/) / [backend](qa/test-cases/backend/)             | Future evidence-backed manual case specifications                     |
+| [qa/test-cases/frontend](qa/test-cases/frontend/) / [backend](qa/test-cases/backend/)             | M1 FE/BE specifications and future cases                              |
 | [qa/test-execution/frontend](qa/test-execution/frontend/) / [backend](qa/test-execution/backend/) | Actual execution records, kept separate from specifications           |
 | [qa/bug-reports/frontend](qa/bug-reports/frontend/) / [backend](qa/bug-reports/backend/)          | Observed defects only                                                 |
-| [qa/test-data](qa/test-data/)                                                                     | Future synthetic, documented fixtures                                 |
-| [qa/automation](qa/automation/)                                                                   | Future automation conventions; no suite yet                           |
+| [qa/test-data](qa/test-data/)                                                                     | Synthetic documented M1 fixtures                                      |
+| [qa/automation](qa/automation/)                                                                   | Automation conventions; executable tests live in src and tests        |
 
 ## Prerequisites
 
@@ -47,11 +47,11 @@ Accounts, collaboration, project/history management, Jira/GitHub product integra
 ## Install and run
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000`. No AI key is required for M0. Copy `.env.example` to a local ignored environment file only when configuration is needed; never commit real secrets.
+Open `http://localhost:3000`. No AI key is required for M1. Copy `.env.example` to a local ignored environment file only when configuration is needed; never commit real secrets.
 
 For a production build:
 
@@ -69,21 +69,21 @@ npm run start
 | `npm run test`          | Run deterministic Vitest unit tests                      |
 | `npm run test:watch`    | Run unit tests in watch mode                             |
 | `npm run test:coverage` | Produce unit coverage with V8                            |
-| `npm run test:e2e`      | Run the Playwright Chromium shell smoke test             |
+| `npm run test:e2e`      | Run the Playwright Chromium upload suite                 |
 | `npm run check`         | Run lint, typecheck, unit tests, and production build    |
 
 Install the Playwright browser once with `npx playwright install chromium`. CI installs Chromium with its Linux system dependencies and runs both `check` and E2E.
 
 ## Project structure
 
-| Location             | Responsibility                                     |
-| -------------------- | -------------------------------------------------- |
-| `src/app/`           | Next.js application shell and global styling       |
-| `src/config/`        | Server environment schema and validation boundary  |
-| `src/lib/`           | Shared foundation utilities and project identity   |
-| `tests/e2e/`         | Playwright infrastructure and shell smoke coverage |
-| `.github/workflows/` | CI and Release Please automation                   |
-| `.husky/`            | Local commit and push quality gates                |
+| Location             | Responsibility                                    |
+| -------------------- | ------------------------------------------------- |
+| `src/app/`           | Next.js upload page, API route and global styling |
+| `src/config/`        | Server environment schema and validation boundary |
+| `src/lib/`           | Upload validation services                        |
+| `tests/e2e/`         | Playwright upload flow coverage                   |
+| `.github/workflows/` | CI and Release Please automation                  |
+| `.husky/`            | Local commit and push quality gates               |
 
 Business-service directories will be added with the milestone that implements them; M0 does not create empty parser, AI, generator, or export layers.
 
@@ -93,4 +93,4 @@ Read docs → understand current state → check scope → inspect code → plan
 
 Use a feature branch and Conventional Commits. Pre-commit runs staged lint/format checks, commit-msg runs Commitlint, and pre-push runs typecheck plus unit tests. GitHub Actions repeats validation and E2E. After merge to `main`, Release Please manages release pull requests and v-prefixed tags; it does not bump versions on local pushes. See [Versioning and Release](docs/engineering/VERSIONING_RELEASE.md).
 
-**No unresolved MVP-blocking Open Questions.** M0 is the active completed foundation once the required local checks pass. The next expected milestone is **M1 — PRD Upload & File Validation**, which is not part of this change.
+**No unresolved MVP-blocking Open Questions.** M1 implements upload validation only. The next milestone is **M2: Document Extraction**, under separate authorization.

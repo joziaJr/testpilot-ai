@@ -1,0 +1,2 @@
+# Synthetic PRD
+The user can upload one requirements document.

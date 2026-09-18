@@ -44,3 +44,7 @@ These are future fixture categories, not created or executed data. Limits/encodi
 For each future fixture record its path/identifier, purpose, synthetic provenance, source/requirement revision, format/language/encoding, size or checksum where useful, deliberate mutations, expected parser/analysis facts, known ambiguity, and cleanup needs. For mock responses, record schema/provider-adapter compatibility. Keep expected source facts separate from expected model wording.
 
 Store files and their documentation under [qa/test-data](../../qa/test-data/). Use synthetic, non-sensitive content. Do not commit credentials, confidential PRDs, or personal data. Preserve the exact executed fixture revision in execution evidence so later edits cannot invalidate the record. Link fixtures from cases, automation, and executions without adding a default Test Data export column.
+
+## M1 implementation
+
+M1 synthetic fixtures and deliberate mutations are described in [the fixture manifest](../../qa/test-data/m1/README.md). These are real local files; later parser/AI fixture categories above remain planned.

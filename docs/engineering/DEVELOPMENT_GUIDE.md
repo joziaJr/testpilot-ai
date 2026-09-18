@@ -2,7 +2,7 @@
 
 ## Current foundation
 
-M0 implements Next.js, TypeScript, Tailwind CSS, shadcn/ui conventions, Zod, Vitest, Playwright, Husky, Commitlint, GitHub Actions, and Release Please at version `0.1.0`. The application remains a shell with no product business workflow. Inspect the current manifests, lockfile, status, and documentation before later milestone work.
+M0 implements the toolchain at version `0.1.0`; M1 implements PRD upload validation. See [M1 Upload](M1_UPLOAD.md). Document extraction, AI and later workflows remain unimplemented. Inspect manifests, lockfile, status and documentation before later milestone work.
 
 ## Mandatory rules
 
@@ -45,7 +45,7 @@ Before adding a dependency, explain its purpose and preserve existing configurat
 | TSV                        | Selected fields/order, escaping, Unicode, formula-handling contract, round-trip with agreed consumer |
 | Cross-stage changes        | Affected integration and critical end-to-end flows                                                   |
 
-Run commands from `package.json`. `npm run check` covers lint, typecheck, unit tests, and build; `npm run test:e2e` covers the browser smoke path. Add meaningful tests for actual behavior, record exact results, and do not report missing or remote-only checks as passed.
+Run commands from `package.json`. `npm run check` covers lint, typecheck, unit tests, and build; `npm run test:e2e` covers the browser upload flow. Add meaningful tests for actual behavior, record exact results, and do not report missing or remote-only checks as passed.
 
 ## Documentation validation
 

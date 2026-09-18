@@ -2,7 +2,7 @@
 
 ## Status and objective
 
-Approved direction: one full-stack web application using preferred Next.js, TypeScript, Tailwind CSS, shadcn/ui, and Zod. Use a simple table or justify TanStack Table; no microservices or unnecessary infrastructure. [PRD](../product/PRD.md), [Business Flow](../product/BUSINESS_FLOW.md), and [resolved OQ-03–OQ-14](../product/OPEN_QUESTIONS.md) govern the design. No implementation or package installation exists yet.
+Approved direction: one full-stack web application using preferred Next.js, TypeScript, Tailwind CSS, shadcn/ui, and Zod. Use a simple table or justify TanStack Table; no microservices or unnecessary infrastructure. [PRD](../product/PRD.md), [Business Flow](../product/BUSINESS_FLOW.md), and [resolved OQ-03–OQ-14](../product/OPEN_QUESTIONS.md) govern the design. M0 is installed and M1 implements [upload validation](M1_UPLOAD.md). Document extraction, AI and downstream responsibilities remain planned.
 
 ```text
 Browser: upload / review / selection / preview / edit / delete / export
@@ -50,4 +50,4 @@ File validation, extraction, AI transport/schema, session, and export are separa
 
 ## Implementation entry conditions
 
-Before implementing, inspect state and select compatible tool versions/parser libraries within approved direction. One server-configurable provider adapter may initially use a suitable Gemini API free-tier model; no provider selector. Both uses analysis, frontend-generation, backend-generation usage actions with missing counters null. No unresolved MVP-blocking Open Questions remain. M0 starts only under separate authorization.
+Before implementing, inspect state and select compatible tool versions/parser libraries within approved direction. One server-configurable provider adapter may initially use a suitable Gemini API free-tier model; no provider selector. Both uses analysis, frontend-generation, backend-generation usage actions with missing counters null. No unresolved MVP-blocking Open Questions remain. M2 document extraction requires separate authorization.

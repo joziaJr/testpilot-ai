@@ -25,8 +25,9 @@ export const serverEnvironmentSchema = z
       .int()
       .refine((value) => value === 10, {
         message: "MAX_UPLOAD_SIZE_MB must match the approved 10 MB policy",
-      }),
-    AI_MAX_AUTOMATIC_RETRIES: z.coerce.number().int().min(0).max(1),
+      })
+      .default(10),
+    AI_MAX_AUTOMATIC_RETRIES: z.coerce.number().int().min(0).max(1).default(1),
     AI_TIMEOUT_MS: optionalPositiveInteger,
     AI_CONTEXT_TOKEN_LIMIT: optionalPositiveInteger,
   })

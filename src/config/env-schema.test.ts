@@ -14,6 +14,12 @@ const validEnvironment = {
 };
 
 describe("serverEnvironmentSchema", () => {
+  it("defaults the approved policies without requiring local environment files", () => {
+    const config = serverEnvironmentSchema.parse({});
+    expect(config.MAX_UPLOAD_SIZE_MB).toBe(10);
+    expect(config.AI_MAX_AUTOMATIC_RETRIES).toBe(1);
+    expect(config.AI_API_KEY).toBeUndefined();
+  });
   it("accepts the approved M0 defaults without requiring an AI key", () => {
     expect(serverEnvironmentSchema.parse(validEnvironment)).toEqual({
       NODE_ENV: "test",

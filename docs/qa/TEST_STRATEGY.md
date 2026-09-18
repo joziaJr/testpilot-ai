@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-Define how functional and failure behavior will be assessed. M0 implements a deterministic environment-schema unit test and Playwright application-shell smoke test; no product business-flow tests exist yet. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles. The [Test Plan](TEST_PLAN.md) maps future MVP coverage.
+Define how functional and failure behavior will be assessed. M0 environment checks and M1 upload validation unit/server/browser tests are implemented. See [M1 Upload](../engineering/M1_UPLOAD.md) for precise coverage and limitations. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles. The [Test Plan](TEST_PLAN.md) maps future MVP coverage.
 
 ## Testing levels
 

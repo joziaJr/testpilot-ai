@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-The two-stage pipeline is fixed by [PRD §§17, 24–26](../product/PRD.md), [Business Flow](../product/BUSINESS_FLOW.md), and [resolved decisions](../product/OPEN_QUESTIONS.md). Implement one server-configurable provider adapter (a suitable Gemini API free-tier model may be initial), strict structured JSON with Zod validation, and deterministic non-AI boundaries. Apply [AI Rules](AI_RULES.md).
+The two-stage pipeline is fixed by [PRD §§17, 24–26](../product/PRD.md), [Business Flow](../product/BUSINESS_FLOW.md), and [resolved decisions](../product/OPEN_QUESTIONS.md). M3 implements the first AI stage through one server-configurable Gemini adapter, strict structured JSON with Zod and deterministic grounding checks. The test-case generator remains planned. Apply [AI Rules](AI_RULES.md) and the exact [M3 contract](M3_AI_PRD_ANALYZER.md).
 
 ```text
 PRD

@@ -19,9 +19,8 @@ export default function Home() {
             Upload your PRD
           </h1>
           <p className="mt-5 max-w-xl leading-7 text-[var(--muted)]">
-            Choose your product requirements document. We’ll validate the file
-            and extract its readable text so you can start with the right
-            source.
+            Choose your product requirements document. We’ll validate and
+            extract it, then let you start a source-grounded AI analysis.
           </p>
           <PrdUpload {...getUploadPolicy()} />
         </section>

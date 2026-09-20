@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  analysisErrorMessages,
+  type AnalysisErrorCode,
+} from "@/lib/analysis/analysis-errors";
+import {
   extractionErrorMessages,
   type ExtractionErrorCode,
 } from "@/lib/extraction/extraction-errors";
@@ -20,6 +24,18 @@ type SelectedDocument = FileMetadata & {
     | { status: "extracting" }
     | { status: "success"; characterCount: number }
     | { status: "failed"; code: ExtractionErrorCode; message: string };
+  analysis?:
+    | { status: "ready" }
+    | { status: "analyzing" }
+    | {
+        status: "success";
+        language: "indonesian" | "english";
+        modules: number;
+        features: number;
+        requirements: number;
+        needConfirmation: number;
+      }
+    | { status: "failed"; code: AnalysisErrorCode; message: string };
 };
 
 export function PrdUpload({
@@ -34,6 +50,7 @@ export function PrdUpload({
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const selectedFile = useRef<File | null>(null);
   const request = useRef<AbortController | null>(null);
   const revision = useRef(0);
   const lifecycle = useRef(0);
@@ -58,6 +75,100 @@ export function PrdUpload({
     revision.current++;
     request.current?.abort();
     setBusy(false);
+  }
+
+  async function analyze() {
+    const file = selectedFile.current;
+    if (!file || selected?.extraction.status !== "success") return;
+    cancel();
+    setError("");
+    const id = revision.current;
+    const controller = new AbortController();
+    request.current = controller;
+    setSelected((current) =>
+      current ? { ...current, analysis: { status: "analyzing" } } : current,
+    );
+    const timeout = setTimeout(() => controller.abort(), 70_000);
+    try {
+      const body = new FormData();
+      body.set("file", file);
+      const response = await fetch("/api/documents/analyze", {
+        method: "POST",
+        body,
+        signal: controller.signal,
+      });
+      const result = await response.json();
+      if (id !== revision.current) return;
+      if (
+        result.validation?.status !== "passed" ||
+        result.extraction?.status !== "success" ||
+        result.extraction?.fileName !== file.name ||
+        result.extraction?.fileType !== extensionOf(file.name)
+      )
+        throw new Error("Invalid analysis response");
+      const outcome = result.analysis;
+      if (response.ok && outcome?.status === "success") {
+        const analysis = outcome.analysis;
+        if (
+          !["indonesian", "english"].includes(analysis?.documentLanguage) ||
+          !Array.isArray(analysis?.modules) ||
+          !Array.isArray(analysis?.features) ||
+          !Array.isArray(analysis?.requirements) ||
+          !Array.isArray(analysis?.needConfirmation)
+        )
+          throw new Error("Invalid analysis response");
+        setSelected((current) =>
+          current
+            ? {
+                ...current,
+                analysis: {
+                  status: "success",
+                  language: analysis.documentLanguage,
+                  modules: analysis.modules.length,
+                  features: analysis.features.length,
+                  requirements: analysis.requirements.length,
+                  needConfirmation: analysis.needConfirmation.length,
+                },
+              }
+            : current,
+        );
+        return;
+      }
+      const code = outcome?.error?.code as AnalysisErrorCode;
+      if (
+        outcome?.status !== "failed" ||
+        !Object.hasOwn(analysisErrorMessages, code)
+      )
+        throw new Error("Invalid analysis failure response");
+      setSelected((current) =>
+        current
+          ? {
+              ...current,
+              analysis: {
+                status: "failed",
+                code,
+                message: analysisErrorMessages[code],
+              },
+            }
+          : current,
+      );
+    } catch {
+      if (id === revision.current)
+        setSelected((current) =>
+          current
+            ? {
+                ...current,
+                analysis: {
+                  status: "failed",
+                  code: "ANALYSIS_FAILED",
+                  message: analysisErrorMessages.ANALYSIS_FAILED,
+                },
+              }
+            : current,
+        );
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   async function choose(files: File[]) {
@@ -102,6 +213,7 @@ export function PrdUpload({
       if (result.file?.name !== file.name || result.file?.size !== file.size)
         throw new Error("Invalid upload response");
       validationPassed = true;
+      selectedFile.current = null;
       setSelected({
         name: file.name,
         size: file.size,
@@ -142,7 +254,9 @@ export function PrdUpload({
             status: "success",
             characterCount: extraction.characterCount,
           },
+          analysis: { status: "ready" },
         });
+        selectedFile.current = file;
         return;
       }
       const code = extraction.error?.code as ExtractionErrorCode;
@@ -162,6 +276,7 @@ export function PrdUpload({
           message: extractionErrorMessages[code],
         },
       });
+      selectedFile.current = null;
     } catch {
       if (id === revision.current) {
         if (validationPassed) {
@@ -176,6 +291,7 @@ export function PrdUpload({
               message: extractionErrorMessages.EXTRACTION_FAILED,
             },
           });
+          selectedFile.current = null;
         } else {
           setError(uploadMessages.UPLOAD_FAILED);
         }
@@ -261,12 +377,48 @@ export function PrdUpload({
                 characters
               </p>
             )}
+            {selected.analysis?.status === "ready" && (
+              <p className="mt-2 text-sm text-[var(--muted)]">
+                Analysis: READY
+              </p>
+            )}
+            {selected.analysis?.status === "analyzing" && (
+              <p className="mt-2 text-sm text-[var(--muted)]">
+                Analysis: IN PROGRESS
+              </p>
+            )}
+            {selected.analysis?.status === "success" && (
+              <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">
+                <p className="font-semibold">Analysis: COMPLETE</p>
+                <p className="mt-1">
+                  {selected.analysis.modules} modules ·{" "}
+                  {selected.analysis.features} features ·{" "}
+                  {selected.analysis.requirements} requirements ·{" "}
+                  {selected.analysis.needConfirmation} need confirmation
+                </p>
+              </div>
+            )}
+            {selected.extraction.status === "success" && (
+              <button
+                type="button"
+                disabled={selected.analysis?.status === "analyzing"}
+                onClick={() => void analyze()}
+                className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {selected.analysis?.status === "analyzing"
+                  ? "Analyzing…"
+                  : selected.analysis?.status === "failed"
+                    ? "Retry analysis"
+                    : "Analyze PRD"}
+              </button>
+            )}
             <button
               type="button"
               className="mt-4 rounded px-2 py-1 text-sm font-semibold underline underline-offset-4"
               onClick={() => {
                 cancel();
                 setSelected(null);
+                selectedFile.current = null;
                 setError("");
               }}
             >
@@ -281,6 +433,14 @@ export function PrdUpload({
           className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
         >
           Extraction: FAILED — {selected.extraction.message}
+        </p>
+      )}
+      {selected?.analysis?.status === "failed" && (
+        <p
+          role="alert"
+          className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+        >
+          Analysis: FAILED — {selected.analysis.message}
         </p>
       )}
       {error && (

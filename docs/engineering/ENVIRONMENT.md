@@ -2,7 +2,7 @@
 
 ## Purpose and current state
 
-M0 installs the Next.js/TypeScript/Tailwind CSS/shadcn/ui conventions/Zod foundation with npm scripts, local hooks, tests, and CI. The secret-free [.env.example](../../.env.example) documents the server configuration contract. No AI provider is called and no AI key is required in M0.
+M0 installs the Next.js/TypeScript/Tailwind CSS/shadcn/ui conventions/Zod foundation with npm scripts, local hooks, tests, and CI. The secret-free [.env.example](../../.env.example) documents the server configuration contract. M3 real analysis requires a server-side Gemini key; deterministic tests require none.
 
 [PRD §§25–26, 29–30, 33](../product/PRD.md) and [resolved OQ-03–OQ-14](../product/OPEN_QUESTIONS.md) define the baseline. No unresolved MVP-blocking questions remain. Actual parser/model selection, dependency versions, provider-specific context/timeout values, and deployment wiring are delegated implementation choices.
 
@@ -22,7 +22,7 @@ These roles do not mandate separate infrastructure or additional product environ
 | Setting category     | Approved baseline                                                                                                               | Implementation work                                                                                      |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | Runtime and scripts  | Next.js 16, React 19, TypeScript 6, Tailwind CSS 4, shadcn/ui conventions, Zod 4                                                | Node >=22.22.1; npm 11.6.2; commands are documented in the root README                                   |
-| Provider/model       | One server-configurable adapter; suitable Gemini API free-tier model may be initial; no UI selector                             | Select current suitable model and document privacy/retention                                             |
+| Provider/model       | One server-configurable Gemini adapter; no UI selector                                                                          | M3 defaults to live-validated `gemini-3.5-flash`; review official privacy/data terms for each deployment |
 | Provider credential  | Environment or approved secret storage; server-only; never client bundle/Git                                                    | Wire secret-free template names and deployment storage                                                   |
 | Upload/parser policy | 10 MB maximum; unencrypted readable PDF/OOXML DOCX; UTF-8 TXT with/without BOM; server extension/type checks                    | Select dedicated compatible parsers and consistent byte representation for the configured 10 MB limit    |
 | Processing policy    | At most 1 automatic transient retry; one active same-action request; reject invalid/partial JSON; responsive loading            | Centralize timeout/context/resource configuration; no arbitrary scattered limits or required initial SLO |
@@ -51,3 +51,7 @@ M1 defaults MAX_UPLOAD_SIZE_MB to 10 and AI_MAX_AUTOMATIC_RETRIES to 1 when abse
 ## M2 implementation
 
 M2 adds no environment variable and requires no AI credential. It uses locked `pdfjs-dist` and patched `mammoth` server dependencies, with centralized extraction/resource constants documented in [M2 Extraction](M2_EXTRACTION.md). `npm ci` remains the reproducible install path. Node must satisfy both the project requirement and PDF.js's Node >=22.13 or >=24 engine requirement.
+
+## M3 implementation
+
+M3 fixes `AI_PROVIDER=gemini`, defaults `AI_MODEL=gemini-3.5-flash`, `AI_TIMEOUT_MS=60000`, and `AI_CONTEXT_TOKEN_LIMIT=900000`. `AI_API_KEY` remains optional at startup/build so non-AI functionality works; an analysis request without it returns `AI_CONFIGURATION_ERROR`. `AI_MAX_AUTOMATIC_RETRIES` remains 0 or 1. `AI_TEST_MODE=true` activates the deterministic fake only outside production; production schema validation rejects it. All settings are server-only and none uses `NEXT_PUBLIC_`.

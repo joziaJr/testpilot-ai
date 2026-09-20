@@ -1,0 +1,4 @@
+# Akses Akun
+Pengguna dapat mengatur ulang kata sandi.
+Kata sandi wajib memiliki minimal 8 karakter.
+Admin dapat mengelola pengguna.

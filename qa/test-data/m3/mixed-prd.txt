@@ -1,0 +1,4 @@
+# Pengelolaan Akun
+Pengguna dapat mengatur ulang kata sandi.
+Kata sandi wajib memiliki minimal 8 karakter.
+Users receive a confirmation notice.

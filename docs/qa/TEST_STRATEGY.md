@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-Define how functional and failure behavior will be assessed. M0 environment checks, M1 upload validation and M2 extraction unit/server/browser tests are implemented. See [M1 Upload](../engineering/M1_UPLOAD.md) and [M2 Extraction](../engineering/M2_EXTRACTION.md) for precise coverage and limitations. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles. The [Test Plan](TEST_PLAN.md) maps future MVP coverage.
+Define how functional and failure behavior will be assessed. M0 environment checks, M1 upload validation, M2 extraction and M3 analyzer unit/server/browser tests are implemented. See [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), and [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md) for precise coverage and limitations. Deterministic analyzer tests remain separate from non-deterministic live-model quality review. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles.
 
 ## Testing levels
 

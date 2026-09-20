@@ -64,4 +64,8 @@ PRD sections 5/27/33, Business Flow section 3 and OQ-03/OQ-06/OQ-13 map to [M1 F
 
 ## M2 implementation
 
-PRD sections 5/24.1/27/31/33/34, Business Flow section 3 and OQ-03/OQ-11/OQ-13 map to Document Extraction, [M2 FE specifications](../../qa/test-cases/frontend/M2_EXTRACTION.md), [M2 BE specifications](../../qa/test-cases/backend/M2_EXTRACTION.md), and named unit/integration/E2E tests in their Notes. [M2 Extraction](../engineering/M2_EXTRACTION.md) defines the implemented contract and exclusions. No M3 analysis coverage, manual result or bug link is claimed.
+PRD sections 5/24.1/27/31/33/34, Business Flow section 3 and OQ-03/OQ-11/OQ-13 map to Document Extraction, [M2 FE specifications](../../qa/test-cases/frontend/M2_EXTRACTION.md), [M2 BE specifications](../../qa/test-cases/backend/M2_EXTRACTION.md), and named unit/integration/E2E tests in their Notes. [M2 Extraction](../engineering/M2_EXTRACTION.md) defines the implemented contract and exclusions. No manual result or bug link is claimed.
+
+## M3 implementation
+
+PRD sections 6–8/24–27/29/31/33–35, Business Flow PRD Analysis, and OQ-04–OQ-06/OQ-10–OQ-13 map to [M3 FE specifications](../../qa/test-cases/frontend/M3_AI_ANALYZER.md), [M3 BE specifications](../../qa/test-cases/backend/M3_AI_ANALYZER.md), named analyzer unit/integration/E2E tests, and the [M3 evaluation corpus](../../qa/test-data/m3/README.md). [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md) defines the schema, evidence and exclusions. Deterministic software/security coverage is not reported as live-model semantic quality, manual execution, penetration-test clearance or M4 review coverage.

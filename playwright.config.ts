@@ -19,6 +19,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "npm run dev",
+    env: { ...process.env, AI_TEST_MODE: "true" },
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

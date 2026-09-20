@@ -7,9 +7,16 @@ const optionalText = z.preprocess(
   blankToUndefined,
   z.string().trim().min(1).optional(),
 );
-const optionalPositiveInteger = z.preprocess(
-  blankToUndefined,
-  z.coerce.number().int().positive().optional(),
+const booleanFromEnvironment = z.preprocess(
+  (value) =>
+    value === undefined || value === ""
+      ? undefined
+      : value === true || value === "true"
+        ? true
+        : value === false || value === "false"
+          ? false
+          : value,
+  z.boolean().default(false),
 );
 
 export const serverEnvironmentSchema = z
@@ -17,8 +24,11 @@ export const serverEnvironmentSchema = z
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    AI_PROVIDER: z.string().trim().min(1).default("gemini"),
-    AI_MODEL: optionalText,
+    AI_PROVIDER: z.literal("gemini").default("gemini"),
+    AI_MODEL: z.preprocess(
+      blankToUndefined,
+      z.string().trim().min(1).default("gemini-3.5-flash"),
+    ),
     AI_API_KEY: optionalText,
     MAX_UPLOAD_SIZE_MB: z.coerce
       .number()
@@ -28,10 +38,25 @@ export const serverEnvironmentSchema = z
       })
       .default(10),
     AI_MAX_AUTOMATIC_RETRIES: z.coerce.number().int().min(0).max(1).default(1),
-    AI_TIMEOUT_MS: optionalPositiveInteger,
-    AI_CONTEXT_TOKEN_LIMIT: optionalPositiveInteger,
+    AI_TIMEOUT_MS: z.preprocess(
+      blankToUndefined,
+      z.coerce.number().int().positive().default(60_000),
+    ),
+    AI_CONTEXT_TOKEN_LIMIT: z.preprocess(
+      blankToUndefined,
+      z.coerce.number().int().positive().default(900_000),
+    ),
+    AI_TEST_MODE: booleanFromEnvironment,
   })
-  .strict();
+  .strict()
+  .superRefine((value, context) => {
+    if (value.NODE_ENV === "production" && value.AI_TEST_MODE)
+      context.addIssue({
+        code: "custom",
+        path: ["AI_TEST_MODE"],
+        message: "AI_TEST_MODE must be false in production",
+      });
+  });
 
 export type ServerEnvironment = z.infer<typeof serverEnvironmentSchema>;
 
@@ -45,5 +70,6 @@ export function selectServerEnvironment(source: NodeJS.ProcessEnv) {
     AI_MAX_AUTOMATIC_RETRIES: source.AI_MAX_AUTOMATIC_RETRIES,
     AI_TIMEOUT_MS: source.AI_TIMEOUT_MS,
     AI_CONTEXT_TOKEN_LIMIT: source.AI_CONTEXT_TOKEN_LIMIT,
+    AI_TEST_MODE: source.AI_TEST_MODE,
   };
 }

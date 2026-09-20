@@ -52,3 +52,7 @@ M1 synthetic fixtures and deliberate mutations are described in [the fixture man
 ## M2 implementation
 
 M2 deterministic PDF/DOCX/TXT fixtures, deliberate malformed/textless variants, generation instructions and checksums are recorded in the [M2 fixture manifest](../../qa/test-data/m2/README.md). Language and normalization strings are also created in memory by unit tests. Fixtures establish parser expectations only, not AI semantic or case-generation oracles.
+
+## M3 implementation
+
+M3 synthetic English, Indonesian, mixed-language and prompt-injection PRDs plus sixteen evaluation oracles are documented in the [M3 fixture manifest](../../qa/test-data/m3/README.md). `npm run test:ai-eval` validates the deterministic harness only. The manifest contains no live Gemini result, manual status, credential or confidential PRD.

@@ -2,7 +2,7 @@
 
 ## Purpose and evidence status
 
-This business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the runners; M1 adds upload validation; M2 adds TXT/PDF/DOCX extraction, normalization, server integration and browser coverage. The inventory below describes the full MVP, with implemented details in [M1 Upload](../engineering/M1_UPLOAD.md) and [M2 Extraction](../engineering/M2_EXTRACTION.md). No Actual Result or execution Status is assigned to unexecuted cases.
+This business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the runners; M1 adds upload validation; M2 adds extraction; M3 adds server-side structured PRD analysis and deterministic analyzer evaluation. The inventory below describes the full MVP, with implemented details in [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), and [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md). No Actual Result or execution Status is assigned to unexecuted cases.
 
 Turn planning items into cases only with source-backed expectations. The [approved OQ-03–OQ-14 decisions](../product/OPEN_QUESTIONS.md) now provide upload, language, eligibility, session, schema, TSV, retry, privacy, and release oracles. No unresolved MVP-blocking Open Questions remain. TestPilot's 10 MB limit must not be inferred for another uploaded target PRD.
 
@@ -62,4 +62,4 @@ For long content/counts, record actual dimensions and usability observations; no
 
 ## Completion criteria and current limitations
 
-Coverage is complete only when required behavior has sourced expectations, cases, actual execution evidence, and reviewed results. Release-critical failures and unanswered acceptance questions must be resolved before claiming QA readiness. M1 upload and M2 extraction specifications, fixtures and automation exist; AI analysis and later workflow coverage remain future work. No manual execution or release clearance is implied. See [Traceability](TRACEABILITY.md) for source-to-coverage mappings.
+Coverage is complete only when required behavior has sourced expectations, cases, actual execution evidence, and reviewed results. Release-critical failures and unanswered acceptance questions must be resolved before claiming QA readiness. M1 upload, M2 extraction and M3 analyzer specifications, fixtures and deterministic automation exist; live-model quality results, requirement review, generation and later workflow coverage remain future work. No manual execution or release clearance is implied. See [Traceability](TRACEABILITY.md) for source-to-coverage mappings.

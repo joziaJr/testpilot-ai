@@ -60,3 +60,7 @@ M1 now has a concrete upload endpoint and safe error catalog: see [M1 Upload](M1
 ## M2 implementation
 
 M2 now separates validation errors from typed extraction errors. `EMPTY_DOCUMENT`, `UNREADABLE_DOCUMENT`, `MALFORMED_DOCUMENT`, and `EXTRACTION_FAILED` map parser/decoder/resource failures to fixed user-safe messages. Validation-pass/extraction-fail returns 422 metadata without extracted text or raw exceptions. See [M2 Extraction](M2_EXTRACTION.md).
+
+## M3 implementation
+
+M3 adds `AI_CONFIGURATION_ERROR`, `AI_PROVIDER_UNAVAILABLE`, `AI_TIMEOUT`, `AI_RATE_LIMITED`, `AI_INVALID_RESPONSE`, `AI_CONTEXT_LIMIT`, and `ANALYSIS_FAILED`. Only transient provider/network classes receive the configured maximum one automatic retry. Invalid JSON/schema/evidence is rejected immediately under OQ-12. Responses include fixed safe text and attempt metadata without raw provider errors, prompts, PRD bodies, keys, stack traces or paths. See [M3 Analyzer](M3_AI_PRD_ANALYZER.md).

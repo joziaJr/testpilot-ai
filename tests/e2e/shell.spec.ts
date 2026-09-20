@@ -192,3 +192,108 @@ test("a removed selection cannot be restored by a late extraction response", asy
   await expect(page.getByText(/Extraction:/)).toHaveCount(0);
   await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
 });
+
+test("analyzes an extracted PRD and shows a structured summary", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByLabel("Choose PRD file")
+    .setInputFiles(extractionFixture("requirements.txt"));
+  await expect(
+    page.getByText("Analysis: READY", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await expect(
+    page.getByText("Analysis: IN PROGRESS", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Analysis: COMPLETE", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/1 modules · 1 features · 1 requirements/),
+  ).toBeVisible();
+});
+
+test("recovers from a safe AI failure and clears analysis on replacement", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByLabel("Choose PRD file")
+    .setInputFiles(extractionFixture("requirements.txt"));
+  await page.route("**/api/documents/analyze", async (route) => {
+    await route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        validation: { status: "passed" },
+        extraction: {
+          status: "success",
+          fileName: "requirements.txt",
+          fileType: "txt",
+          characterCount: 89,
+        },
+        analysis: {
+          status: "failed",
+          error: {
+            code: "AI_PROVIDER_UNAVAILABLE",
+            message: "private provider detail must be ignored",
+          },
+          usage: [],
+        },
+      }),
+    });
+  });
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "AI analysis is temporarily unavailable",
+  );
+  await expect(page.getByRole("main")).not.toContainText(
+    "private provider detail",
+  );
+  await page.unroute("**/api/documents/analyze");
+  await page.getByRole("button", { name: "Retry analysis" }).click();
+  await expect(
+    page.getByText("Analysis: COMPLETE", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Choose PRD file")
+    .setInputFiles(fixture("requirements.txt"));
+  await expect(
+    page.getByText("Analysis: READY", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Analysis: COMPLETE", { exact: true }),
+  ).toHaveCount(0);
+});
+
+test("a removed selection cannot be restored by a late analysis response", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page
+    .getByLabel("Choose PRD file")
+    .setInputFiles(extractionFixture("requirements.txt"));
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let started!: () => void;
+  const intercepted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  await page.route("**/api/documents/analyze", async (route) => {
+    const response = await route.fetch();
+    started();
+    await gate;
+    await route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await intercepted;
+  await page.getByRole("button", { name: "Remove file" }).click();
+  release();
+  await page.unrouteAll({ behavior: "wait" });
+  await expect(page.getByText(/Analysis:/)).toHaveCount(0);
+  await expect(page.getByText("File accepted", { exact: true })).toHaveCount(0);
+});

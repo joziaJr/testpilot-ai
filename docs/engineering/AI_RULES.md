@@ -41,7 +41,9 @@ PRD §14 requires coverage-based quantity without redundancy, never a user-speci
 
 ## Ambiguity protocol
 
-Use the exact marker `Need Confirmation` for ambiguous uploaded requirements. Preserve the source text, identify the missing/conflicting rule, and describe the specific question. Do not silently choose one interpretation. Suggested QA inference must be identifiable as inference and must not assert a missing business rule.
+Use the exact marker `Need Confirmation` for ambiguous uploaded requirements. An ambiguity describes the unclear, incomplete, contradictory or underspecified source information. Need Confirmation asks the concrete question needed to resolve it and references that ambiguity. Preserve the source text, identify the missing/conflicting rule, and describe the specific question. Do not silently choose one interpretation or emit the same unresolved issue as unrelated records. Suggested QA inference must be identifiable as inference and must not assert a missing business rule.
+
+In M3, one requirement is exactly one independently testable product behavior, constraint, validation, state transition, persistence expectation, navigation outcome, or required/optional field rule. Separate independent rules even when adjacent. Keep one logical enumerated constraint, such as a field's complete allowed-value list, as one requirement rather than one item per value. Atomicity never authorizes fabricated requirements or arbitrary count targets.
 
 Examples include an absent API contract, undefined maximum, contradictory requirement, or unclear field. Under [resolved OQ-05/OQ-10](../product/OPEN_QUESTIONS.md), keep `Need Confirmation` primarily in structured analysis metadata (recommended status, requirement, reason, missing_details). Display it during analysis; no new testcase column or default export field. Do not generate scenarios depending on the missing information; unrelated source-backed scenarios remain eligible.
 
@@ -54,3 +56,7 @@ Frontend cases cover documented fields, input validation, buttons, navigation, v
 ## Enforcement and review
 
 Apply these rules in prompts, structured-output validation, human review, and AI regression evaluation. Validate each factual expected result against its source. Correctly shaped JSON can still contain invented behavior. Invalid, empty, or partial AI output is a failure to handle, not permission to fill fields from guesses. See [AI Architecture](AI_ARCHITECTURE.md), [Test Plan](../qa/TEST_PLAN.md), and [Error Handling](ERROR_HANDLING.md).
+
+## M3 enforcement
+
+M3 places these rules in a separate system instruction, JSON-encodes raw PRD text as untrusted user data, requires strict structured output, and checks every evidence excerpt and internal reference before accepting analysis. Invalid, duplicated, partial or ungrounded output returns a safe failure. These deterministic controls do not replace human semantic review. See [M3 Analyzer](M3_AI_PRD_ANALYZER.md).

@@ -47,3 +47,7 @@ M1 implements bounded request-local upload validation, no storage/logging of doc
 ## M2 implementation
 
 M2 keeps parsing server-side and in memory after repeated M1 validation. Client responses omit extracted text; logs omit raw content, paths and parser exceptions. PDF.js performs text extraction without OCR/rendering/external resource configuration. Mammoth 1.11.0 runs in a bounded worker after archive expansion checks; version 1.10.0 was rejected due to its directory-traversal advisory. Exact resource limits and residual parser/DoS risks are documented in [M2 Extraction](M2_EXTRACTION.md). No penetration testing or malware scanning was performed.
+
+## M3 implementation
+
+M3 separates system instructions from a JSON-encoded untrusted PRD data envelope, requests strict JSON, and rejects ungrounded excerpts, broken references, duplicate facts, malformed/partial/oversized output and stale browser responses. Gemini credentials stay in a server header and never enter URLs, bundles, fixtures, responses or logs. Token counting, a 900,000-token ceiling, 60-second deadline, one transient retry maximum, 1,000,000-byte provider-response limit and production-disabled fake provider bound the implemented path. Prompt separation and schemas reduce risk but do not prove semantic safety; human review and controlled live adversarial evaluation remain required. See [M3 Analyzer](M3_AI_PRD_ANALYZER.md).

@@ -1,0 +1,6 @@
+# Account Settings
+Email is required.
+Password is required.
+Password must contain at least 8 characters.
+Priority must be one of Low, Medium, and High.
+Admin can manage users, but the permitted management operations are not defined.

@@ -1,6 +1,6 @@
 # Agent instructions
 
-The repository contains M0, M1 upload validation, M2 document extraction and M3 AI PRD analysis. See docs/engineering/M1_UPLOAD.md, docs/engineering/M2_EXTRACTION.md and docs/engineering/M3_AI_PRD_ANALYZER.md for implemented behavior and limitations. Requirement review and later product features must be introduced only by their approved milestone, within MVP scope.
+The repository contains M0, M1 upload validation, M2 document extraction, M3 AI PRD analysis, and M4 requirement review and selection. See docs/engineering/M1_UPLOAD.md, docs/engineering/M2_EXTRACTION.md, docs/engineering/M3_AI_PRD_ANALYZER.md, and docs/engineering/M4_REQUIREMENT_REVIEW.md for implemented behavior and limitations. Test generation and later product features must be introduced only by their approved milestone, within MVP scope.
 
 ## Required workflow
 

@@ -64,3 +64,7 @@ M2 now separates validation errors from typed extraction errors. `EMPTY_DOCUMENT
 ## M3 implementation
 
 M3 adds `AI_CONFIGURATION_ERROR`, `AI_PROVIDER_UNAVAILABLE`, `AI_TIMEOUT`, `AI_RATE_LIMITED`, `AI_INVALID_RESPONSE`, `AI_CONTEXT_LIMIT`, and `ANALYSIS_FAILED`. Only transient provider/network classes receive the configured maximum one automatic retry. Invalid JSON/schema/evidence is rejected immediately under OQ-12. Responses include fixed safe text and attempt metadata without raw provider errors, prompts, PRD bodies, keys, stack traces or paths. See [M3 Analyzer](M3_AI_PRD_ANALYZER.md).
+
+## M4 implementation
+
+M4 adds no server endpoint. Invalid, partial, unknown-ID, or stale session selections are rejected by the client-side Zod/domain contract and cannot be confirmed. Malformed persisted state is ignored and the user can reset, replace, remove, or reanalyze to recover. Need Confirmation is product context rather than a runtime failure and does not block unrelated source-backed selection.

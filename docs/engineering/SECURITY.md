@@ -51,3 +51,7 @@ M2 keeps parsing server-side and in memory after repeated M1 validation. Client 
 ## M3 implementation
 
 M3 separates system instructions from a JSON-encoded untrusted PRD data envelope, requests strict JSON, and rejects ungrounded excerpts, broken references, duplicate facts, malformed/partial/oversized output and stale browser responses. Gemini credentials stay in a server header and never enter URLs, bundles, fixtures, responses or logs. Token counting, a 900,000-token ceiling, 60-second deadline, one transient retry maximum, 1,000,000-byte provider-response limit and production-disabled fake provider bound the implemented path. Prompt separation and schemas reduce risk but do not prove semantic safety; human review and controlled live adversarial evaluation remain required. See [M3 Analyzer](M3_AI_PRD_ANALYZER.md).
+
+## M4 implementation
+
+M4 renders all AI/source strings through React text nodes and introduces no HTML interpretation. It persists only the active structured analysis and identity-bound selection in same-tab `sessionStorage`; it does not persist the uploaded file, raw extracted PRD, provider payload, provider response dump, prompt, or credential. Malformed/stale stored data is rejected, while successful replacement, reanalysis, and removal invalidate it. Same-origin XSS could access session data, so dependency review, escaping, CSP planning, and adversarial UI tests remain required. See [M4 Review](M4_REQUIREMENT_REVIEW.md).

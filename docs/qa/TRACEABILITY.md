@@ -69,3 +69,7 @@ PRD sections 5/24.1/27/31/33/34, Business Flow section 3 and OQ-03/OQ-11/OQ-13 m
 ## M3 implementation
 
 PRD sections 6–8/24–27/29/31/33–35, Business Flow PRD Analysis, and OQ-04–OQ-06/OQ-10–OQ-13 map to [M3 FE specifications](../../qa/test-cases/frontend/M3_AI_ANALYZER.md), [M3 BE specifications](../../qa/test-cases/backend/M3_AI_ANALYZER.md), named analyzer unit/integration/E2E tests, and the [M3 evaluation corpus](../../qa/test-data/m3/README.md). [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md) defines the schema, evidence and exclusions. Deterministic software/security coverage is not reported as live-model semantic quality, manual execution, penetration-test clearance or M4 review coverage.
+
+## M4 implementation
+
+PRD sections 7–8/24.2/28–29/33–35, Business Flow Requirement Review, and OQ-05/OQ-06/OQ-13 map to [M4 FE specifications](../../qa/test-cases/frontend/M4_REQUIREMENT_REVIEW.md), review contract/session unit tests, and browser tests in `tests/e2e/shell.spec.ts`. [M4 Review](../engineering/M4_REQUIREMENT_REVIEW.md) defines selection semantics, identity validation, persistence, privacy, and exclusions. M4 adds no backend endpoint and produces no test cases, execution result, or bug record.

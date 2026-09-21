@@ -36,6 +36,110 @@ export class FakeAiProvider implements AiProvider {
     const indonesian = /\b(pengguna|dapat|wajib|dokumen|mengunggah)\b/i.test(
       envelope.prdText,
     );
+    if (envelope.prdText.includes("# M4 Review Fixture")) {
+      const [
+        createTask,
+        deleteTask,
+        workspaceRule,
+        titleValidation,
+        adminRule,
+      ] = [
+        "Users can create tasks.",
+        "Users can delete tasks.",
+        "Every task belongs to a workspace.",
+        "Task title is required.",
+        "Admin can manage tasks.",
+      ];
+      return {
+        jsonText: JSON.stringify({
+          documentLanguage: "english",
+          modules: [
+            {
+              id: "module-task-management",
+              name: "Task Management",
+              description: "Create and delete workspace tasks.",
+              evidence: { excerpt: createTask, section: "M4 Review Fixture" },
+            },
+          ],
+          features: [
+            {
+              id: "feature-create-task",
+              moduleId: "module-task-management",
+              name: "Create Task",
+              description: null,
+              evidence: { excerpt: createTask, section: "M4 Review Fixture" },
+            },
+            {
+              id: "feature-delete-task",
+              moduleId: "module-task-management",
+              name: "Delete Task",
+              description: null,
+              evidence: { excerpt: deleteTask, section: "M4 Review Fixture" },
+            },
+          ],
+          requirements: [
+            {
+              id: "requirement-create-task",
+              moduleId: "module-task-management",
+              featureId: "feature-create-task",
+              statement: createTask,
+              evidence: { excerpt: createTask, section: "M4 Review Fixture" },
+            },
+            {
+              id: "requirement-delete-task",
+              moduleId: "module-task-management",
+              featureId: "feature-delete-task",
+              statement: deleteTask,
+              evidence: { excerpt: deleteTask, section: "M4 Review Fixture" },
+            },
+          ],
+          businessRules: [
+            {
+              id: "rule-workspace-task",
+              requirementIds: ["requirement-create-task"],
+              rule: workspaceRule,
+              evidence: {
+                excerpt: workspaceRule,
+                section: "M4 Review Fixture",
+              },
+            },
+          ],
+          validations: [
+            {
+              id: "validation-task-title",
+              requirementIds: ["requirement-create-task"],
+              validation: titleValidation,
+              evidence: {
+                excerpt: titleValidation,
+                section: "M4 Review Fixture",
+              },
+            },
+          ],
+          ambiguities: [
+            {
+              id: "ambiguity-admin-management",
+              requirementId: "requirement-delete-task",
+              sourceText: adminRule,
+              reason: "The permitted task operations are not specified.",
+              evidence: { excerpt: adminRule, section: "M4 Review Fixture" },
+            },
+          ],
+          needConfirmation: [
+            {
+              id: "confirmation-admin-management",
+              status: "need_confirmation",
+              ambiguityId: "ambiguity-admin-management",
+              requirement:
+                "Which task management operations may an admin perform?",
+              reason: "The source does not enumerate the permitted operations.",
+              missingDetails: ["Permitted admin task operations"],
+              evidence: { excerpt: adminRule, section: "M4 Review Fixture" },
+            },
+          ],
+        }),
+        usage: { inputTokens: 40, outputTokens: 120, totalTokens: 160 },
+      };
+    }
     return {
       jsonText: JSON.stringify({
         documentLanguage: indonesian ? "indonesian" : "english",

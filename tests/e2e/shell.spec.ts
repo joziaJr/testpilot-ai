@@ -3,6 +3,7 @@ import path from "node:path";
 const fixture = (name: string) => path.resolve("qa/test-data/m1", name);
 const extractionFixture = (name: string) =>
   path.resolve("qa/test-data/m2", name);
+const reviewFixture = path.resolve("qa/test-data/m4/review.txt");
 
 test("upload interface is accessible on a narrow viewport", async ({
   page,
@@ -296,4 +297,125 @@ test("a removed selection cannot be restored by a late analysis response", async
   await page.unrouteAll({ behavior: "wait" });
   await expect(page.getByText(/Analysis:/)).toHaveCount(0);
   await expect(page.getByText("File accepted", { exact: true })).toHaveCount(0);
+});
+
+test("reviews linked M3 analysis with module, feature, and scope selection", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Review AI analysis" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Task Management", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Create Task", { exact: true })).toBeVisible();
+  await expect(page.getByText("Delete Task", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("1 need confirmation", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Which task management operations may an admin perform?", {
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  const moduleSelection = page.getByLabel("Select module Task Management");
+  await moduleSelection.check();
+  await expect(page.getByLabel("Create Task")).toBeChecked();
+  await expect(page.getByLabel("Delete Task")).toBeChecked();
+  await page.getByLabel("Delete Task").uncheck();
+  await expect(moduleSelection).not.toBeChecked();
+  await expect(moduleSelection).toHaveJSProperty("indeterminate", true);
+
+  for (const scope of ["Frontend", "Backend", "Frontend + Backend"]) {
+    await page.getByLabel(scope, { exact: true }).check();
+    await expect(page.getByLabel(scope, { exact: true })).toBeChecked();
+  }
+  await page
+    .getByRole("button", { name: "Confirm reviewed selection" })
+    .click();
+  await expect(page.getByText("Ready for Test Case Generation")).toBeVisible();
+
+  await page.getByLabel("Create Task").uncheck();
+  await expect(page.getByText("Ready for Test Case Generation")).toHaveCount(0);
+});
+
+test("restores a confirmed review on refresh and invalidates it on reanalysis", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await page.getByLabel("Create Task").check();
+  await page.getByLabel("Frontend + Backend", { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Confirm reviewed selection" })
+    .click();
+  await expect(page.getByText("Ready for Test Case Generation")).toBeVisible();
+
+  await page.reload();
+  await expect(
+    page.getByText("Analysis: COMPLETE", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Create Task")).toBeChecked();
+  await expect(page.getByText("Ready for Test Case Generation")).toBeVisible();
+  await expect(
+    page.getByText(/Review restored for this browser session/),
+  ).toBeVisible();
+
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await expect(page.getByLabel("Create Task")).not.toBeChecked();
+  await expect(page.getByText("Ready for Test Case Generation")).toHaveCount(0);
+});
+
+test("removing the active document clears persisted analysis and review", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await page.getByLabel("Create Task").check();
+  await page.getByLabel("Backend", { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Confirm reviewed selection" })
+    .click();
+  await page.getByRole("button", { name: "Remove file" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "Review AI analysis" }),
+  ).toHaveCount(0);
+  expect(
+    await page.evaluate(() => ({
+      analysis: sessionStorage.getItem("testpilot.active-analysis.v1"),
+      review: sessionStorage.getItem("testpilot.review-selection.v1"),
+    })),
+  ).toEqual({ analysis: null, review: null });
+});
+
+test("supports keyboard selection without narrow viewport overflow", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+
+  const moduleSelection = page.getByLabel("Select module Task Management");
+  await moduleSelection.focus();
+  await page.keyboard.press("Space");
+  await expect(page.getByLabel("Create Task")).toBeChecked();
+  const frontendScope = page.getByLabel("Frontend", { exact: true });
+  await frontendScope.focus();
+  await page.keyboard.press("Space");
+  await expect(frontendScope).toBeChecked();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

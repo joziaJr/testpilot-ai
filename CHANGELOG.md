@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/joziaJr/testpilot-ai/compare/v0.2.0...v0.3.0) (2026-09-20)
+
+
+### Features
+
+* add AI PRD analyzer ([feafcd7](https://github.com/joziaJr/testpilot-ai/commit/feafcd768cd4dc0354878baad8791247070bd576))
+* add AI PRD analyzer ([84a5e7e](https://github.com/joziaJr/testpilot-ai/commit/84a5e7e988ec315b2df6dac77d34cc4709becd9a))
+
 ## [0.2.0](https://github.com/joziaJr/testpilot-ai/compare/v0.1.1...v0.2.0) (2026-09-18)
 
 ### Features

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/joziaJr/testpilot-ai/compare/v0.3.0...v0.4.0) (2026-09-21)
+
+
+### Features
+
+* add requirement review and selection ([57a94ac](https://github.com/joziaJr/testpilot-ai/commit/57a94ac8211d48bb1c78e42d0b92299df5f3ddfa))
+* add requirement review and selection ([6716902](https://github.com/joziaJr/testpilot-ai/commit/6716902fb443205daf121c937da521f367f0d7f0))
+
 ## [0.3.0](https://github.com/joziaJr/testpilot-ai/compare/v0.2.0...v0.3.0) (2026-09-20)
 
 

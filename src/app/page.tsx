@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 export default function Home() {
   return (
     <main className="min-h-screen bg-[var(--surface)] px-6 py-8 text-[var(--foreground)] sm:py-12">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-6xl">
         <header className="border-b border-[var(--line)] pb-6 text-lg font-semibold tracking-tight">
           TestPilot <span className="text-[var(--accent)]">AI</span>
         </header>
@@ -20,7 +20,8 @@ export default function Home() {
           </h1>
           <p className="mt-5 max-w-xl leading-7 text-[var(--muted)]">
             Choose your product requirements document. We’ll validate and
-            extract it, then let you start a source-grounded AI analysis.
+            extract it, run a source-grounded AI analysis, and review the
+            requirements selected for future testing.
           </p>
           <PrdUpload {...getUploadPolicy()} />
         </section>

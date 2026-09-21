@@ -1,0 +1,7 @@
+# M4 Review Fixture
+
+Users can create tasks.
+Users can delete tasks.
+Every task belongs to a workspace.
+Task title is required.
+Admin can manage tasks.

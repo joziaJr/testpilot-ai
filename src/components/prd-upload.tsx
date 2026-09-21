@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { RequirementReview } from "@/components/requirement-review";
 import {
   analysisErrorMessages,
   type AnalysisErrorCode,
 } from "@/lib/analysis/analysis-errors";
+import {
+  prdAnalysisSchema,
+  type PrdAnalysis,
+} from "@/lib/analysis/analysis-contract";
 import {
   extractionErrorMessages,
   type ExtractionErrorCode,
@@ -17,6 +22,11 @@ import {
   type UploadExtension,
   type UploadErrorCode,
 } from "@/lib/upload-validation";
+import {
+  ANALYSIS_SESSION_KEY,
+  parsePersistedAnalysisSession,
+  REVIEW_SELECTION_SESSION_KEY,
+} from "@/lib/review/review-session";
 
 type SelectedDocument = FileMetadata & {
   fileType: UploadExtension;
@@ -29,11 +39,8 @@ type SelectedDocument = FileMetadata & {
     | { status: "analyzing" }
     | {
         status: "success";
-        language: "indonesian" | "english";
-        modules: number;
-        features: number;
-        requirements: number;
-        needConfirmation: number;
+        analysisId: string;
+        result: PrdAnalysis;
       }
     | { status: "failed"; code: AnalysisErrorCode; message: string };
 };
@@ -49,11 +56,17 @@ export function PrdUpload({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [fileAvailable, setFileAvailable] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const selectedFile = useRef<File | null>(null);
   const request = useRef<AbortController | null>(null);
   const revision = useRef(0);
   const lifecycle = useRef(0);
+  function clearReviewSession() {
+    sessionStorage.removeItem(ANALYSIS_SESSION_KEY);
+    sessionStorage.removeItem(REVIEW_SELECTION_SESSION_KEY);
+  }
+
   useEffect(() => {
     const lifecycleRef = lifecycle;
     const revisionRef = revision;
@@ -71,6 +84,31 @@ export function PrdUpload({
     };
   }, []);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const restored = parsePersistedAnalysisSession(
+        sessionStorage.getItem(ANALYSIS_SESSION_KEY),
+      );
+      if (!restored) return;
+      setSelected({
+        ...restored.file,
+        extraction: {
+          status: "success",
+          characterCount: restored.file.characterCount,
+        },
+        analysis: {
+          status: "success",
+          analysisId: restored.analysisId,
+          result: restored.analysis,
+        },
+      });
+      setFileAvailable(false);
+    }, 0);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   function cancel() {
     revision.current++;
     request.current?.abort();
@@ -80,7 +118,9 @@ export function PrdUpload({
   async function analyze() {
     const file = selectedFile.current;
     if (!file || selected?.extraction.status !== "success") return;
+    const fileType = selected.fileType;
     cancel();
+    clearReviewSession();
     setError("");
     const id = revision.current;
     const controller = new AbortController();
@@ -108,26 +148,32 @@ export function PrdUpload({
         throw new Error("Invalid analysis response");
       const outcome = result.analysis;
       if (response.ok && outcome?.status === "success") {
-        const analysis = outcome.analysis;
-        if (
-          !["indonesian", "english"].includes(analysis?.documentLanguage) ||
-          !Array.isArray(analysis?.modules) ||
-          !Array.isArray(analysis?.features) ||
-          !Array.isArray(analysis?.requirements) ||
-          !Array.isArray(analysis?.needConfirmation)
-        )
-          throw new Error("Invalid analysis response");
+        const parsed = prdAnalysisSchema.safeParse(outcome.analysis);
+        if (!parsed.success) throw new Error("Invalid analysis response");
+        const analysisId = crypto.randomUUID();
+        const analysis = parsed.data;
+        sessionStorage.setItem(
+          ANALYSIS_SESSION_KEY,
+          JSON.stringify({
+            analysisId,
+            file: {
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              fileType,
+              characterCount: result.extraction.characterCount,
+            },
+            analysis,
+          }),
+        );
         setSelected((current) =>
           current
             ? {
                 ...current,
                 analysis: {
                   status: "success",
-                  language: analysis.documentLanguage,
-                  modules: analysis.modules.length,
-                  features: analysis.features.length,
-                  requirements: analysis.requirements.length,
-                  needConfirmation: analysis.needConfirmation.length,
+                  analysisId,
+                  result: analysis,
                 },
               }
             : current,
@@ -213,7 +259,9 @@ export function PrdUpload({
       if (result.file?.name !== file.name || result.file?.size !== file.size)
         throw new Error("Invalid upload response");
       validationPassed = true;
+      clearReviewSession();
       selectedFile.current = null;
+      setFileAvailable(false);
       setSelected({
         name: file.name,
         size: file.size,
@@ -257,6 +305,7 @@ export function PrdUpload({
           analysis: { status: "ready" },
         });
         selectedFile.current = file;
+        setFileAvailable(true);
         return;
       }
       const code = extraction.error?.code as ExtractionErrorCode;
@@ -277,6 +326,7 @@ export function PrdUpload({
         },
       });
       selectedFile.current = null;
+      setFileAvailable(false);
     } catch {
       if (id === revision.current) {
         if (validationPassed) {
@@ -292,6 +342,7 @@ export function PrdUpload({
             },
           });
           selectedFile.current = null;
+          setFileAvailable(false);
         } else {
           setError(uploadMessages.UPLOAD_FAILED);
         }
@@ -391,14 +442,15 @@ export function PrdUpload({
               <div className="mt-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-950">
                 <p className="font-semibold">Analysis: COMPLETE</p>
                 <p className="mt-1">
-                  {selected.analysis.modules} modules ·{" "}
-                  {selected.analysis.features} features ·{" "}
-                  {selected.analysis.requirements} requirements ·{" "}
-                  {selected.analysis.needConfirmation} need confirmation
+                  {selected.analysis.result.modules.length} modules ·{" "}
+                  {selected.analysis.result.features.length} features ·{" "}
+                  {selected.analysis.result.requirements.length} requirements ·{" "}
+                  {selected.analysis.result.needConfirmation.length} need
+                  confirmation
                 </p>
               </div>
             )}
-            {selected.extraction.status === "success" && (
+            {selected.extraction.status === "success" && fileAvailable && (
               <button
                 type="button"
                 disabled={selected.analysis?.status === "analyzing"}
@@ -412,6 +464,12 @@ export function PrdUpload({
                     : "Analyze PRD"}
               </button>
             )}
+            {selected.extraction.status === "success" && !fileAvailable && (
+              <p className="mt-4 text-sm text-slate-600">
+                Review restored for this browser session. Replace the file to
+                run a new analysis.
+              </p>
+            )}
             <button
               type="button"
               className="mt-4 rounded px-2 py-1 text-sm font-semibold underline underline-offset-4"
@@ -419,6 +477,8 @@ export function PrdUpload({
                 cancel();
                 setSelected(null);
                 selectedFile.current = null;
+                setFileAvailable(false);
+                clearReviewSession();
                 setError("");
               }}
             >
@@ -451,6 +511,13 @@ export function PrdUpload({
           {error}
           {selected ? " Your previously accepted file is unchanged." : ""}
         </p>
+      )}
+      {selected?.analysis?.status === "success" && (
+        <RequirementReview
+          key={selected.analysis.analysisId}
+          analysisId={selected.analysis.analysisId}
+          analysis={selected.analysis.result}
+        />
       )}
     </div>
   );

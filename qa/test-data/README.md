@@ -1,6 +1,6 @@
 # Test data storage
 
-Store future synthetic fixtures and a manifest here under [Test Data Guide](../../docs/qa/TEST_DATA_GUIDE.md). No fixtures are created in this foundation.
+Synthetic M1–M5 fixtures and their local manifests live here under [Test Data Guide](../../docs/qa/TEST_DATA_GUIDE.md). M5 reuses the documented M4 review fixture and records its evaluation purpose in [m5](m5/README.md).
 
 For each future fixture record path, purpose, source revision, format/language/encoding, construction, size/checksum, facts, and ambiguity. TestPilot's maximum is now 10 MB, with readable unencrypted text PDF/OOXML DOCX and UTF-8 TXT with/without BOM. Include below/at/above configured maximum and explicit rejection variants. Unknown limits in an unrelated uploaded PRD remain unknown.
 

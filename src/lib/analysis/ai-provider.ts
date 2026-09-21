@@ -16,6 +16,9 @@ export type ProviderAnalysisRequest = {
   signal: AbortSignal;
 };
 
+export type ProviderGenerationRequest = ProviderAnalysisRequest;
+export type ProviderGenerationResponse = ProviderAnalysisResponse;
+
 export type ProviderErrorKind =
   "configuration" | "timeout" | "rate_limited" | "unavailable" | "failed";
 
@@ -35,4 +38,10 @@ export interface AiProvider {
   generateAnalysis(
     request: ProviderAnalysisRequest,
   ): Promise<ProviderAnalysisResponse>;
+}
+
+export interface TestCaseGenerationProvider extends AiProvider {
+  generateTestCases(
+    request: ProviderGenerationRequest,
+  ): Promise<ProviderGenerationResponse>;
 }

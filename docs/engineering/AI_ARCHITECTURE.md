@@ -67,6 +67,10 @@ Show accepted cases for QA review before export, with separate FE/BE tabs. Edit 
 
 Keep provider/model settings and credentials server-side. One configurable adapter may initially use a suitable Gemini API free-tier model; select the actual compatible model at implementation time and document its privacy/retention behavior. No UI provider selector, silent fallback, or indefinite retries. Map provider failures safely without inventing TestPilot HTTP contracts. No permanent raw PRD retention or content in usage logs.
 
+## M5 implementation
+
+M5 reuses the M3 Gemini and deterministic fake-provider implementations. It adds a strict generation operation rather than a second provider architecture. The server rebuilds the M4 selection, serializes only selected grounded context, counts that context, requests one layer-specific structured response per FE/BE action, and validates every returned reference before application-owned IDs and fields are assigned. Both runs the two independent actions in parallel and keeps results separate. See [M5 Generation](M5_TEST_CASE_GENERATION.md).
+
 Record per-request Action, Model, Input Tokens, Output Tokens, Total Tokens, Timestamp. Both follows `prd_analysis`, `generate_frontend`, `generate_backend`; never `generate_both`. Separate layer generation requests preserve the action mapping; reuse the completed analysis rather than implying it must be repeated for each generation. Store missing provider usage values as `null`, not `0`; record actual retry attempts distinctly. Metadata may persist without source content or a dashboard (OQ-11/OQ-13).
 
 For future evaluation, record model/provider identifier, prompt revision, schema revision, source-fixture revision, and actual results. Use mocked responses for deterministic failure checks and synthetic source fixtures for controlled live evaluation. Assess grounding, ambiguity handling, selected-scope coverage, duplicates, and layer correctness; do not demand identical prose across runs. A model/prompt/schema change requires relevant regression and guardrail checks before release.

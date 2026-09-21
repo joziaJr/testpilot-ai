@@ -5,6 +5,21 @@ const extractionFixture = (name: string) =>
   path.resolve("qa/test-data/m2", name);
 const reviewFixture = path.resolve("qa/test-data/m4/review.txt");
 
+async function prepareGeneration(
+  page: import("@playwright/test").Page,
+  scope: "Frontend" | "Backend" | "Frontend + Backend",
+) {
+  await page.goto("/");
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await page.getByLabel("Create Task").check();
+  await page.getByLabel(scope, { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Confirm reviewed selection" })
+    .click();
+  await expect(page.getByText("Ready for Test Case Generation")).toBeVisible();
+}
+
 test("upload interface is accessible on a narrow viewport", async ({
   page,
 }) => {
@@ -418,4 +433,167 @@ test("supports keyboard selection without narrow viewport overflow", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+});
+
+for (const [scope, summary, expectedId] of [
+  ["Frontend", /3 frontend · 0 backend/, "TP-FE-001"],
+  ["Backend", /0 frontend · 3 backend/, "TP-BE-001"],
+  ["Frontend + Backend", /3 frontend · 3 backend/, "TP-BE-001"],
+] as const) {
+  test(`generates separate ${scope} structured test cases`, async ({
+    page,
+  }) => {
+    await prepareGeneration(page, scope);
+    await page
+      .getByRole("button", { name: "Generate Test Cases", exact: true })
+      .click();
+    await expect(page.getByText("Generation: IN PROGRESS")).toBeVisible();
+    await expect(page.getByText(summary)).toBeVisible();
+    await expect(page.getByText(expectedId, { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Positive", { exact: true }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Negative", { exact: true }).first(),
+    ).toBeVisible();
+    await expect(page.getByText("Edge", { exact: true }).first()).toBeVisible();
+    if (scope === "Frontend + Backend") {
+      await expect(
+        page.getByRole("heading", { name: "Frontend Test Cases (3)" }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Backend Test Cases (3)" }),
+      ).toBeVisible();
+      await expect(page.getByText("TP-FE-001", { exact: true })).toBeVisible();
+    }
+  });
+}
+
+test("shows a safe generation failure without provider details", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  await page.route("**/api/test-cases/generate", async (route) => {
+    await route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        generation: {
+          status: "failed",
+          error: {
+            code: "GENERATION_PROVIDER_UNAVAILABLE",
+            message: "private provider detail",
+          },
+          usage: { frontend: [], backend: [] },
+        },
+      }),
+    });
+  });
+  await page
+    .getByRole("button", { name: "Generate Test Cases", exact: true })
+    .click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "AI generation is temporarily unavailable",
+  );
+  await expect(page.getByRole("main")).not.toContainText(
+    "private provider detail",
+  );
+});
+
+test("changing review selection or scope clears generated cases", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  await page
+    .getByRole("button", { name: "Generate Test Cases", exact: true })
+    .click();
+  await expect(page.getByText(/3 frontend · 0 backend/)).toBeVisible();
+
+  await page.getByLabel("Create Task").uncheck();
+  await expect(page.getByText(/Generation: COMPLETE/)).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.generation-result.v1"),
+    ),
+  ).toBeNull();
+
+  await page.getByLabel("Create Task").check();
+  await page.getByLabel("Frontend", { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Confirm reviewed selection" })
+    .click();
+  await page
+    .getByRole("button", { name: "Generate Test Cases", exact: true })
+    .click();
+  await expect(page.getByText(/3 frontend · 0 backend/)).toBeVisible();
+  await page.getByLabel("Backend", { exact: true }).check();
+  await expect(page.getByText(/Generation: COMPLETE/)).toHaveCount(0);
+});
+
+test("removing the PRD clears generated cases", async ({ page }) => {
+  await prepareGeneration(page, "Frontend");
+  await page
+    .getByRole("button", { name: "Generate Test Cases", exact: true })
+    .click();
+  await expect(page.getByText(/3 frontend · 0 backend/)).toBeVisible();
+  await page.getByRole("button", { name: "Remove file" }).click();
+  await expect(page.getByText(/Generation: COMPLETE/)).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.generation-result.v1"),
+    ),
+  ).toBeNull();
+});
+
+test("restores generated cases after refresh and clears them on replacement", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  await page
+    .getByRole("button", { name: "Generate Test Cases", exact: true })
+    .click();
+  await expect(page.getByText(/3 frontend · 0 backend/)).toBeVisible();
+  await page.reload();
+  await expect(page.getByText(/3 frontend · 0 backend/)).toBeVisible();
+
+  await page
+    .getByLabel("Choose PRD file")
+    .setInputFiles(extractionFixture("requirements.txt"));
+  await expect(
+    page.getByText("Analysis: READY", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(/Generation: COMPLETE/)).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.generation-result.v1"),
+    ),
+  ).toBeNull();
+});
+
+test("ignores a stale generation response after selection changes", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let started!: () => void;
+  const intercepted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  await page.route("**/api/test-cases/generate", async (route) => {
+    const response = await route.fetch();
+    started();
+    await gate;
+    await route.fulfill({ response });
+  });
+  await page
+    .getByRole("button", { name: "Generate Test Cases", exact: true })
+    .click();
+  await intercepted;
+  await page.getByLabel("Create Task").uncheck();
+  release();
+  await page.unrouteAll({ behavior: "wait" });
+  await expect(page.getByText(/Generation: COMPLETE/)).toHaveCount(0);
 });

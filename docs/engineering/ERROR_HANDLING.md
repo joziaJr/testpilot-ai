@@ -68,3 +68,7 @@ M3 adds `AI_CONFIGURATION_ERROR`, `AI_PROVIDER_UNAVAILABLE`, `AI_TIMEOUT`, `AI_R
 ## M4 implementation
 
 M4 adds no server endpoint. Invalid, partial, unknown-ID, or stale session selections are rejected by the client-side Zod/domain contract and cannot be confirmed. Malformed persisted state is ignored and the user can reset, replace, remove, or reanalyze to recover. Need Confirmation is product context rather than a runtime failure and does not block unrelated source-backed selection.
+
+## M5 implementation
+
+M5 adds safe `GENERATION_CONFIGURATION_ERROR`, `GENERATION_PROVIDER_UNAVAILABLE`, `GENERATION_TIMEOUT`, `GENERATION_RATE_LIMITED`, `GENERATION_INVALID_REQUEST`, `GENERATION_INVALID_RESPONSE`, `GENERATION_CONTEXT_LIMIT`, and `GENERATION_FAILED` categories. Invalid request/selection input is rejected before provider use. Invalid JSON, schema, grounding, or empty output is retried once, then fails safely. Responses never expose raw source, prompts, provider output, credentials, stack traces, or SDK details.

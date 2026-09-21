@@ -3,6 +3,8 @@ import {
   type AiProvider,
   type ProviderAnalysisRequest,
   type ProviderAnalysisResponse,
+  type ProviderGenerationRequest,
+  type TestCaseGenerationProvider,
 } from "./ai-provider";
 
 export const MAX_PROVIDER_RESPONSE_BYTES = 1_000_000;
@@ -49,7 +51,7 @@ async function readBoundedJson(response: Response) {
   }
 }
 
-export class GeminiProvider implements AiProvider {
+export class GeminiProvider implements AiProvider, TestCaseGenerationProvider {
   constructor(
     readonly model: string,
     private readonly apiKey: string,
@@ -137,5 +139,9 @@ export class GeminiProvider implements AiProvider {
         totalTokens: token(usage?.totalTokenCount),
       },
     };
+  }
+
+  async generateTestCases(request: ProviderGenerationRequest) {
+    return this.generateAnalysis(request);
   }
 }

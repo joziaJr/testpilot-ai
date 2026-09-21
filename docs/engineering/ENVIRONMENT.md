@@ -55,3 +55,5 @@ M2 adds no environment variable and requires no AI credential. It uses locked `p
 ## M3 implementation
 
 M3 fixes `AI_PROVIDER=gemini`, defaults `AI_MODEL=gemini-3.5-flash`, `AI_TIMEOUT_MS=60000`, and `AI_CONTEXT_TOKEN_LIMIT=900000`. `AI_API_KEY` remains optional at startup/build so non-AI functionality works; an analysis request without it returns `AI_CONFIGURATION_ERROR`. `AI_MAX_AUTOMATIC_RETRIES` remains 0 or 1. `AI_TEST_MODE=true` activates the deterministic fake only outside production; production schema validation rejects it. All settings are server-only and none uses `NEXT_PUBLIC_`.
+
+M5 uses the same provider, model, credential, timeout, context ceiling, and retry settings. `AI_TEST_MODE=true` also supplies deterministic test-case generation outside production. M5 adds no environment variable or client-visible configuration.

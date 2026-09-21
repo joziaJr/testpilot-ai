@@ -1,6 +1,6 @@
 # Frontend test case specifications
 
-Store evidence-backed frontend case specifications here when they are authored. There are no case records yet; this README is storage guidance, not a test case.
+Store evidence-backed frontend case specifications here. M1–M5 milestone suites now document implemented coverage; they remain specifications rather than manual execution records.
 
 Follow [Test Case Guide](../../../docs/qa/TEST_CASE_GUIDE.md) for the identical eleven-column FE/BE schema. Use stable case identifiers, short titles, reproducible steps, and source-backed expected results. Cite the approved requirement/technical evidence and its revision in repository context or Notes. Scope each case to documented UI interactions and visible behavior.
 

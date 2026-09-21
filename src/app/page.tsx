@@ -20,8 +20,8 @@ export default function Home() {
           </h1>
           <p className="mt-5 max-w-xl leading-7 text-[var(--muted)]">
             Choose your product requirements document. We’ll validate and
-            extract it, run a source-grounded AI analysis, and review the
-            requirements selected for future testing.
+            extract it, run a source-grounded AI analysis, review the selected
+            requirements, and explicitly generate structured test cases.
           </p>
           <PrdUpload {...getUploadPolicy()} />
         </section>

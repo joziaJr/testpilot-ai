@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-Define how functional and failure behavior will be assessed. M0 environment checks, M1 upload validation, M2 extraction, M3 analyzer unit/server/browser tests, and M4 review contract/browser tests are implemented. See [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md), and [M4 Review](../engineering/M4_REQUIREMENT_REVIEW.md) for precise coverage and limitations. Deterministic analyzer tests remain separate from non-deterministic live-model quality review. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles.
+Define how functional and failure behavior will be assessed. M0 environment checks, M1 upload validation, M2 extraction, M3 analyzer tests, M4 review tests, and M5 generation contract/server/browser tests are implemented. See [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md), [M4 Review](../engineering/M4_REQUIREMENT_REVIEW.md), and [M5 Generation](../engineering/M5_TEST_CASE_GENERATION.md) for precise coverage and limitations. Deterministic software tests remain separate from non-deterministic live-model quality review. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles.
 
 ## Testing levels
 

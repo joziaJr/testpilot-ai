@@ -27,6 +27,7 @@ import {
   parsePersistedAnalysisSession,
   REVIEW_SELECTION_SESSION_KEY,
 } from "@/lib/review/review-session";
+import { GENERATION_SESSION_KEY } from "@/lib/generation/generation-session";
 
 type SelectedDocument = FileMetadata & {
   fileType: UploadExtension;
@@ -65,6 +66,7 @@ export function PrdUpload({
   function clearReviewSession() {
     sessionStorage.removeItem(ANALYSIS_SESSION_KEY);
     sessionStorage.removeItem(REVIEW_SELECTION_SESSION_KEY);
+    sessionStorage.removeItem(GENERATION_SESSION_KEY);
   }
 
   useEffect(() => {

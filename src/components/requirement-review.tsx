@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TestCaseGeneration } from "@/components/test-case-generation";
 import type { PrdAnalysis } from "@/lib/analysis/analysis-contract";
+import { GENERATION_SESSION_KEY } from "@/lib/generation/generation-session";
+import { selectionFingerprint } from "@/lib/generation/test-case-contract";
 import {
   buildReviewedSelection,
   canConfirmReview,
@@ -336,6 +339,10 @@ export function RequirementReview({
   );
   const ready = state.confirmed && contract !== null;
 
+  useEffect(() => {
+    if (hydrated && !ready) sessionStorage.removeItem(GENERATION_SESSION_KEY);
+  }, [hydrated, ready]);
+
   function toggleExpanded(moduleId: string) {
     setExpandedModules((current) => {
       const next = new Set(current);
@@ -530,7 +537,7 @@ export function RequirementReview({
       <fieldset className="mt-8 rounded-2xl border border-slate-300 bg-white p-5">
         <legend className="px-2 text-lg font-semibold">Testing scope</legend>
         <p className="text-sm leading-6 text-slate-600">
-          Choose exactly one scope for future M5 generation.
+          Choose exactly one scope for test case generation.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {scopeOptions.map((option) => (
@@ -598,11 +605,18 @@ export function RequirementReview({
         </div>
         {ready && contract && (
           <p className="mt-4 text-sm text-emerald-900" role="status">
-            Reviewed selection saved for this browser session. M5 generation has
-            not started.
+            Reviewed selection saved for this browser session. Generation starts
+            only when you explicitly request it.
           </p>
         )}
       </section>
+      {ready && contract && (
+        <TestCaseGeneration
+          key={selectionFingerprint(contract)}
+          analysis={analysis}
+          selection={contract}
+        />
+      )}
     </section>
   );
 }

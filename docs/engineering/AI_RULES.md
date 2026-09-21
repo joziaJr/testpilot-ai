@@ -4,6 +4,8 @@
 
 For building TestPilot AI, the approved product [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md) control scope. For generating cases inside TestPilot AI, the user's uploaded PRD controls that target system's expected behavior. These are distinct sources. Apply PRD §§9–14 and BR-01/BR-03/BR-04/BR-06. Neither implementation guesses nor model familiarity with common applications supplies missing requirements.
 
+M5 enforces these rules with an identity-bound M4 contract, selected-context-only prompt envelope, strict provider schema, relationship validation, deterministic deduplication, and application-generated IDs. Unknown or unselected references reject the whole layer result. Priority defaults to `Medium`, Automation remains null, and Need Confirmation can limit Notes without authorizing an answer. See [M5 Generation](M5_TEST_CASE_GENERATION.md).
+
 ## AI MAY
 
 - Generate Positive, Negative, and Edge cases.

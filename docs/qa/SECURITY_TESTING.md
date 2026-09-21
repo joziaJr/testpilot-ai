@@ -38,6 +38,8 @@ M1 upload safeguards, M2 extraction/parser boundaries and M3 analyzer defenses h
 
 No unresolved MVP-blocking Open Questions remain. OQ-03 fixes the 10 MB maximum; OQ-12 fixes duplicate/retry/partial policies with centralized configurable resource limits; OQ-13 fixes privacy/retention; OQ-08 fixes safe TSV behavior. M2 reviews and bounds its parsers. M3 covers instruction/data separation, schema/grounding rejection, response/context/time bounds, retry limits, provider-error sanitization, secret-header placement, production fake-provider rejection and stale/aborted analysis. These are defensive automated checks, not a live prompt-injection clearance, penetration test or malware analysis.
 
+M5 additionally bounds generation JSON, server-validates the M4 contract, sends selected context only, rejects unknown references, separates FE/BE actions, retries at most once, sanitizes errors, escapes generated output, and identity-binds session results. Adversarial prompt and grounding tests remain controlled software evidence, not a penetration-test clearance.
+
 ## Planned AI security coverage
 
 | Area                           | Planned checks / expected safeguard                                                                                                                |

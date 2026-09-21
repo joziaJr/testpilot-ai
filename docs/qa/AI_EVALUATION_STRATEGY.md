@@ -1,5 +1,7 @@
 # AI Evaluation Strategy
 
+M5 adds a separate deterministic generation evaluation invoked by `npm run test:ai-generation-eval`. It checks requirement/module/feature grounding, Positive/Negative/Edge relevance, prohibited invention, FE/BE separation, duplicates, atomicity, expected-result and step quality, Need Confirmation restraint, Indonesian/English/mixed language handling, prompt-injection separation, and strict schema behavior. This complements the M3 analyzer evaluation; neither deterministic fake-provider suite proves live-model consistency.
+
 ## Purpose and status
 
 Plan evaluation of the two AI responsibilities against [PRD §§6–14, 17, 24–26](../product/PRD.md), Business Flow BR-01–BR-07, and [resolved OQ-04/OQ-05/OQ-09–OQ-12](../product/OPEN_QUESTIONS.md). M3 adds the synthetic `M3-2` analyzer corpus and deterministic harness under `qa/test-data/m3`. Test-case generation evaluation remains planned. Output quality and hallucination evaluation remain distinct from functional and [AI security testing](SECURITY_TESTING.md).

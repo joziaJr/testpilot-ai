@@ -2,9 +2,12 @@ import type {
   AiProvider,
   ProviderAnalysisRequest,
   ProviderAnalysisResponse,
+  ProviderGenerationRequest,
+  ProviderGenerationResponse,
+  TestCaseGenerationProvider,
 } from "./ai-provider";
 
-export class FakeAiProvider implements AiProvider {
+export class FakeAiProvider implements AiProvider, TestCaseGenerationProvider {
   readonly model = "testpilot-deterministic-fake";
 
   async countTokens(content: string) {
@@ -175,6 +178,158 @@ export class FakeAiProvider implements AiProvider {
         needConfirmation: [],
       }),
       usage: { inputTokens: 20, outputTokens: 30, totalTokens: 50 },
+    };
+  }
+
+  async generateTestCases(
+    request: ProviderGenerationRequest,
+  ): Promise<ProviderGenerationResponse> {
+    const envelope = JSON.parse(
+      request.userContent.slice(request.userContent.indexOf("{")),
+    ) as {
+      layer: "frontend" | "backend";
+      context: {
+        documentLanguage: "indonesian" | "english";
+        features: Array<{ id: string; moduleId: string; name: string }>;
+        requirements: Array<{
+          id: string;
+          featureId: string | null;
+        }>;
+        validations: Array<{ id: string; requirementIds: string[] }>;
+        businessRules: Array<{ id: string; requirementIds: string[] }>;
+        ambiguities: Array<{ id: string; requirementId: string | null }>;
+        needConfirmation: Array<{ id: string; ambiguityId: string }>;
+      };
+    };
+    const feature = envelope.context.features[0];
+    const requirement = envelope.context.requirements.find(
+      (item) => item.featureId === feature?.id,
+    );
+    if (!feature || !requirement) throw new Error("Invalid fake context");
+    const rules = envelope.context.businessRules.filter((item) =>
+      item.requirementIds.includes(requirement.id),
+    );
+    const validations = envelope.context.validations.filter((item) =>
+      item.requirementIds.includes(requirement.id),
+    );
+    const ambiguityIds = new Set(
+      envelope.context.ambiguities
+        .filter((item) => item.requirementId === requirement.id)
+        .map((item) => item.id),
+    );
+    const confirmations = envelope.context.needConfirmation.filter((item) =>
+      ambiguityIds.has(item.ambiguityId),
+    );
+    const indonesian = envelope.context.documentLanguage === "indonesian";
+    const frontend = envelope.layer === "frontend";
+    const references = {
+      requirementIds: [requirement.id],
+      businessRuleIds: rules.map((item) => item.id),
+      validationIds: validations.map((item) => item.id),
+      needConfirmationIds: confirmations.map((item) => item.id),
+    };
+    const cases = [
+      {
+        moduleId: feature.moduleId,
+        featureId: feature.id,
+        title: indonesian
+          ? `Verifikasi ${feature.name} dengan kondisi valid`
+          : `Verify ${feature.name} with a documented valid condition`,
+        preconditions: null,
+        steps: indonesian
+          ? frontend
+            ? [
+                `Buka ${feature.name}.`,
+                "Lakukan tindakan yang didokumentasikan.",
+              ]
+            : [
+                "Berikan input valid.",
+                "Terapkan perilaku yang didokumentasikan.",
+              ]
+          : frontend
+            ? [`Open ${feature.name}.`, "Perform the documented action."]
+            : [
+                "Provide valid input.",
+                "Apply the documented business behavior.",
+              ],
+        expectedResult: indonesian
+          ? "Perilaku yang didokumentasikan berhasil dilakukan."
+          : "The documented behavior completes successfully.",
+        type: "Positive",
+        ...references,
+      },
+    ];
+    if (validations.length)
+      cases.push(
+        {
+          moduleId: feature.moduleId,
+          featureId: feature.id,
+          title: indonesian
+            ? `Tolak ${feature.name} ketika nilai wajib kosong`
+            : `Reject ${feature.name} when the required value is empty`,
+          preconditions: null,
+          steps: indonesian
+            ? frontend
+              ? [
+                  `Buka ${feature.name}.`,
+                  "Biarkan nilai wajib kosong.",
+                  "Kirim tindakan.",
+                ]
+              : ["Biarkan nilai wajib kosong.", "Terapkan aturan bisnis."]
+            : frontend
+              ? [
+                  `Open ${feature.name}.`,
+                  "Leave the required value empty.",
+                  "Submit the action.",
+                ]
+              : [
+                  "Leave the required value empty.",
+                  "Apply the documented business validation.",
+                ],
+          expectedResult: indonesian
+            ? "Tindakan ditolak sesuai validasi wajib."
+            : "The documented required-field rule rejects the action.",
+          type: "Negative",
+          ...references,
+        },
+        {
+          moduleId: feature.moduleId,
+          featureId: feature.id,
+          title: indonesian
+            ? `Validasi ${feature.name} dengan spasi saja`
+            : `Validate ${feature.name} with whitespace only`,
+          preconditions: null,
+          steps: indonesian
+            ? frontend
+              ? [
+                  `Buka ${feature.name}.`,
+                  "Isi nilai wajib hanya dengan spasi.",
+                  "Kirim tindakan.",
+                ]
+              : [
+                  "Berikan nilai wajib yang hanya berisi spasi.",
+                  "Terapkan validasi bisnis.",
+                ]
+            : frontend
+              ? [
+                  `Open ${feature.name}.`,
+                  "Enter only whitespace in the required value.",
+                  "Submit the action.",
+                ]
+              : [
+                  "Provide a whitespace-only required value.",
+                  "Apply the documented business validation.",
+                ],
+          expectedResult: indonesian
+            ? "Nilai spasi saja tidak memenuhi validasi wajib."
+            : "A whitespace-only value does not satisfy the documented required-field validation.",
+          type: "Edge",
+          ...references,
+        },
+      );
+    return {
+      jsonText: JSON.stringify({ cases }),
+      usage: { inputTokens: 80, outputTokens: 160, totalTokens: 240 },
     };
   }
 }

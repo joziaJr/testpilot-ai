@@ -55,3 +55,7 @@ M3 separates system instructions from a JSON-encoded untrusted PRD data envelope
 ## M4 implementation
 
 M4 renders all AI/source strings through React text nodes and introduces no HTML interpretation. It persists only the active structured analysis and identity-bound selection in same-tab `sessionStorage`; it does not persist the uploaded file, raw extracted PRD, provider payload, provider response dump, prompt, or credential. Malformed/stale stored data is rejected, while successful replacement, reanalysis, and removal invalidate it. Same-origin XSS could access session data, so dependency review, escaping, CSP planning, and adversarial UI tests remain required. See [M4 Review](M4_REQUIREMENT_REVIEW.md).
+
+## M5 implementation
+
+M5 bounds its JSON request, rebuilds the M4 selection on the server, sends only selected facts, separates trusted instructions from untrusted context, and rejects unknown grounding references. Provider requests remain server-side with bounded time, context, response size, and one retry. Generated strings render through React text nodes. Identity/fingerprint-bound session results are cleared by selection, scope, confirmation, reanalysis, replacement, and removal changes. M5 logs no source, prompt, provider response, or key. See [M5 Generation](M5_TEST_CASE_GENERATION.md).

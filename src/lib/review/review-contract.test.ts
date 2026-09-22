@@ -62,6 +62,31 @@ describe("M4 review contract", () => {
     expect(getModuleSelectionStatus(analysis, state, "module-1")).toBe(
       "partial",
     );
+    const cleared = toggleFeatureSelection(analysis, state, "feature-1", false);
+    expect(cleared.selectedModuleIds).toEqual([]);
+    expect(cleared.selectedFeatureIds).toEqual([]);
+    expect(getModuleSelectionStatus(analysis, cleared, "module-1")).toBe(
+      "none",
+    );
+  });
+
+  it("does not add duplicates or unknown IDs through selection actions", () => {
+    const analysis = analysisWithTwoFeatures();
+    const once = toggleModuleSelection(
+      analysis,
+      createReviewSelectionState("analysis-1"),
+      "module-1",
+      true,
+    );
+    const twice = toggleModuleSelection(analysis, once, "module-1", true);
+    expect(twice.selectedModuleIds).toEqual(["module-1"]);
+    expect(twice.selectedFeatureIds).toEqual(["feature-1", "feature-2"]);
+    expect(
+      toggleModuleSelection(analysis, twice, "unknown-module", true),
+    ).toEqual({ ...twice, confirmed: false });
+    expect(
+      toggleFeatureSelection(analysis, twice, "unknown-feature", true),
+    ).toEqual({ ...twice, confirmed: false });
   });
 
   it("requires a valid selection and one testing scope", () => {
@@ -107,6 +132,26 @@ describe("M4 review contract", () => {
       ]),
     );
     expect(buildReviewedSelection(analysis, state, "new-analysis")).toBeNull();
+  });
+
+  it("rejects a feature selected under the wrong parent module", () => {
+    const analysis = analysisWithTwoFeatures();
+    analysis.modules.push({
+      id: "module-2",
+      name: "Other module",
+      description: null,
+      evidence: analysis.modules[0].evidence,
+    });
+    const state = {
+      ...createReviewSelectionState("analysis-1"),
+      selectedModuleIds: ["module-2"],
+      selectedFeatureIds: ["feature-1"],
+      testingScope: "frontend" as const,
+    };
+    expect(validateReviewSelection(analysis, state)).toContain(
+      "feature without selected module: feature-1",
+    );
+    expect(buildReviewedSelection(analysis, state)).toBeNull();
   });
 
   it("derives only selected analysis relationships", () => {
@@ -180,7 +225,7 @@ describe("M4 review contract", () => {
     ).toEqual(["requirement-1"]);
   });
 
-  it("creates a deterministic reset state", () => {
+  it("creates a deterministic reset state for analysis replacement or PRD removal", () => {
     expect(createReviewSelectionState("analysis-new")).toEqual({
       analysisId: "analysis-new",
       selectedModuleIds: [],

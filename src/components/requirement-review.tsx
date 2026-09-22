@@ -197,6 +197,9 @@ function ContextItems({
           evidence={item.evidence}
         >
           <p className="mt-2 text-sm text-amber-950">
+            Linked ambiguity: {item.ambiguityId}
+          </p>
+          <p className="mt-2 text-sm text-amber-950">
             Missing details: {item.missingDetails.join("; ")}
           </p>
         </ReviewItem>
@@ -272,6 +275,9 @@ function UnmappedAnalysis({ analysis }: { analysis: PrdAnalysis }) {
               detail={item.reason}
               evidence={item.evidence}
             >
+              <p className="mt-2 text-sm text-amber-950">
+                Linked ambiguity: {item.ambiguityId}
+              </p>
               <p className="mt-2 text-sm text-amber-950">
                 Missing details: {item.missingDetails.join("; ")}
               </p>
@@ -364,17 +370,47 @@ export function RequirementReview({
         the future testing scope. No test cases are generated in this step.
       </p>
 
-      <div className="mt-5 flex flex-wrap gap-2 text-sm">
-        <span className="rounded-full bg-slate-200 px-3 py-1">
-          {state.selectedModuleIds.length} modules selected
-        </span>
-        <span className="rounded-full bg-slate-200 px-3 py-1">
-          {state.selectedFeatureIds.length} features selected
-        </span>
-        <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-900">
-          {analysis.needConfirmation.length} need confirmation
-        </span>
-      </div>
+      <dl
+        aria-label="Analysis and selection summary"
+        className="mt-5 flex flex-wrap gap-2 text-sm"
+      >
+        <div className="rounded-full bg-blue-100 px-3 py-1 text-blue-950">
+          <dt className="sr-only">Modules detected</dt>
+          <dd>{analysis.modules.length} modules detected</dd>
+        </div>
+        <div className="rounded-full bg-blue-100 px-3 py-1 text-blue-950">
+          <dt className="sr-only">Features detected</dt>
+          <dd>{analysis.features.length} features detected</dd>
+        </div>
+        <div className="rounded-full bg-blue-100 px-3 py-1 text-blue-950">
+          <dt className="sr-only">Requirements detected</dt>
+          <dd>{analysis.requirements.length} requirements detected</dd>
+        </div>
+        <div className="rounded-full bg-blue-100 px-3 py-1 text-blue-950">
+          <dt className="sr-only">Business rules detected</dt>
+          <dd>{analysis.businessRules.length} business rules detected</dd>
+        </div>
+        <div className="rounded-full bg-blue-100 px-3 py-1 text-blue-950">
+          <dt className="sr-only">Validations detected</dt>
+          <dd>{analysis.validations.length} validations detected</dd>
+        </div>
+        <div className="rounded-full bg-amber-100 px-3 py-1 text-amber-900">
+          <dt className="sr-only">Ambiguities detected</dt>
+          <dd>{analysis.ambiguities.length} ambiguities detected</dd>
+        </div>
+        <div className="rounded-full bg-amber-100 px-3 py-1 text-amber-900">
+          <dt className="sr-only">Need Confirmation items</dt>
+          <dd>{analysis.needConfirmation.length} need confirmation</dd>
+        </div>
+        <div className="rounded-full bg-slate-200 px-3 py-1">
+          <dt className="sr-only">Modules selected</dt>
+          <dd>{state.selectedModuleIds.length} modules selected</dd>
+        </div>
+        <div className="rounded-full bg-slate-200 px-3 py-1">
+          <dt className="sr-only">Features selected</dt>
+          <dd>{state.selectedFeatureIds.length} features selected</dd>
+        </div>
+      </dl>
 
       <div className="mt-6 space-y-5">
         {analysis.modules.map((module) => {
@@ -414,6 +450,10 @@ export function RequirementReview({
                   }
                 />
                 <div className="flex items-center gap-3">
+                  <span className="text-xs font-semibold text-slate-600">
+                    {features.length}{" "}
+                    {features.length === 1 ? "feature" : "features"}
+                  </span>
                   <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     {status === "partial"
                       ? "Partially selected"
@@ -496,6 +536,12 @@ export function RequirementReview({
                               >
                                 {feature.name}
                               </label>
+                              <p className="mt-1 text-xs font-semibold text-slate-600">
+                                {requirementIds.size}{" "}
+                                {requirementIds.size === 1
+                                  ? "requirement"
+                                  : "requirements"}
+                              </p>
                               {feature.description && (
                                 <p className="mt-1 text-sm leading-6 text-slate-700">
                                   {feature.description}
@@ -523,6 +569,12 @@ export function RequirementReview({
             </article>
           );
         })}
+        {!analysis.modules.length && (
+          <p className="rounded-2xl border border-slate-300 bg-white p-5 text-sm text-slate-700">
+            No modules were returned in this analysis. Review any unmapped
+            analysis below; there is currently nothing available to select.
+          </p>
+        )}
       </div>
 
       <UnmappedAnalysis analysis={analysis} />

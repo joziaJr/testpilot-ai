@@ -14,6 +14,8 @@ Implemented on `feat/requirement-review`. M4 reviews the validated M3 result; it
 
 Requirements are review context and are not independently selectable. Items without a safe module or feature relationship appear under General / Unmapped Analysis.
 
+The review summary derives totals for every M3 collection and the current module/feature selection. Module headers show their child-feature count, and feature headers show their directly linked requirement count. An analysis with no modules displays an explicit non-selectable empty state rather than placeholder content.
+
 ## Review contract
 
 `src/lib/review/review-contract.ts` owns the deterministic Zod contracts and pure transitions. The confirmed contract contains the analysis identity, selected module and feature IDs, scope, related M3 item IDs, and unmapped item IDs. It copies no requirement prose and invents no relationships. Confirmation requires at least one valid module or feature plus one scope. Any later selection or scope change clears confirmation.
@@ -29,6 +31,8 @@ Browser session storage remains accessible to script running in the same origin.
 ## Accessibility and responsive behavior
 
 The review uses native checkboxes, radio buttons, fieldsets, labels, buttons, headings, lists, and disclosure elements. Module selection exposes its indeterminate state through the native checkbox. Keyboard focus indicators are visible. The layout wraps controls and uses a single-column hierarchy so it remains usable at narrow widths.
+
+Each Need Confirmation item displays its referenced ambiguity ID alongside its reason, missing details, and evidence, so the validated M3 relationship remains explicit even when several uncertainty records are present.
 
 ## Errors and recovery
 

@@ -318,7 +318,23 @@ test("reviews linked M3 analysis with module, feature, and scope selection", asy
     page.getByText("1 need confirmation", { exact: true }),
   ).toBeVisible();
   await expect(
+    page.getByText("1 business rules detected", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("1 validations detected", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("2 features", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("2 requirements detected", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("1 requirement", { exact: true })).toHaveCount(2);
+  await expect(
     page.getByText("Which task management operations may an admin perform?", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Linked ambiguity: ambiguity-admin-management", {
       exact: true,
     }),
   ).toBeVisible();
@@ -368,6 +384,14 @@ test("restores a confirmed review on refresh and invalidates it on reanalysis", 
   ).toBeVisible();
 
   await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await expect(
+    page.getByText("Analysis: READY", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.review-selection.v1"),
+    ),
+  ).toBeNull();
   await page.getByRole("button", { name: "Analyze PRD" }).click();
   await expect(page.getByLabel("Create Task")).not.toBeChecked();
   await expect(page.getByText("Ready for Test Case Generation")).toHaveCount(0);

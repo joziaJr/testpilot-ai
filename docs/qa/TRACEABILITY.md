@@ -73,3 +73,7 @@ PRD sections 6–8/24–27/29/31/33–35, Business Flow PRD Analysis, and OQ-04�
 ## M4 implementation
 
 PRD sections 7–8/24.2/28–29/33–35, Business Flow Requirement Review, and OQ-05/OQ-06/OQ-13 map to [M4 FE specifications](../../qa/test-cases/frontend/M4_REQUIREMENT_REVIEW.md), review contract/session unit tests, and browser tests in `tests/e2e/shell.spec.ts`. [M4 Review](../engineering/M4_REQUIREMENT_REVIEW.md) defines selection semantics, identity validation, persistence, privacy, and exclusions. M4 adds no backend endpoint and produces no test cases, execution result, or bug record.
+
+## M5 implementation
+
+PRD sections 6/9–14/17–18/24.3/25–29/33–35, Business Flow generation, and OQ-04/OQ-05/OQ-09–OQ-13 map M3 requirement IDs through the confirmed M4 selection to internal references on every M5 generated case. [M5 FE specifications](../../qa/test-cases/frontend/M5_TEST_CASE_GENERATOR.md), [M5 backend/API specifications](../../qa/test-cases/backend/M5_TEST_CASE_GENERATOR.md), generator unit/integration tests, deterministic generation evaluation, and browser tests provide automated coverage. [M5 Generator](../engineering/M5_TEST_CASE_GENERATOR.md) defines the exact contract. M6 preview/edit/delete and export coverage are not claimed.

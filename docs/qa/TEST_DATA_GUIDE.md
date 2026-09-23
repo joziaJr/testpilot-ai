@@ -4,6 +4,8 @@
 
 Make actual input values reproducible without adding a default Test Data column to MVP-generated cases. Place concise values in Steps or Notes when necessary; use execution records or automation fixtures for larger data sets.
 
+M5 synthetic generator inputs live under `qa/test-data/m5`. They distinguish documented UI/business behavior from intentionally absent API contracts and unresolved facts, enabling hallucination and layer-separation review without real customer content.
+
 ## Illustrative values
 
 These examples reproduce the supplied brief's QA guidance. They do not establish TestPilot account fields or business rules.

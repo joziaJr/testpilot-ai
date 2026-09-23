@@ -38,9 +38,11 @@ Recommended validation: parse structured output, check the agreed schema, check 
 
 Present detected language and analysis for review. Users select all/specific modules or specific features and FE/BE/Both. Require at least one module/feature; otherwise prevent generation with clear validation (suggested: `Select at least one module or feature.`). Analysis editing is excluded. Omit scenarios requiring missing details, but generate unrelated valid scenarios in the same feature. Never invent missing rules to complete coverage.
 
-## 4. Test Case Generator — AI
+## 4. Test Case Generator — AI (implemented in M5)
 
 Inputs: structured requirements, selected modules/features, testing scope, documented related context, and the agreed schema. Generate concise, reproducible Positive, Negative, and Edge cases. AI determines sufficient quantity for coverage without inflation/redundancy; no user count or case-type selector is specified (PRD §§10, 14, 24). FE describes observable UI behavior; BE describes documented business logic, server validation, authentication/authorization, data handling, and request/response behavior of the uploaded target system. This does not add authentication to TestPilot.
+
+M5 reconstructs the confirmed M4 contract server-side, sends only selected related context, runs separate `generate_frontend` / `generate_backend` provider actions, validates every source reference and obvious duplicate, then assigns independent TP-FE/TP-BE IDs in application code. See [M5 Generator](M5_TEST_CASE_GENERATOR.md). M6 preview remains separate.
 
 Use the eleven FE/BE columns from [Test Case Guide](../qa/TEST_CASE_GUIDE.md) and PRD §17's preferred test_cases representation. Validate strict JSON through application schemas. Required: ID, Module, Feature, Title, Steps, Expected Result, Priority, Type. Optional/nullable: Preconditions, Automation, Notes; use `-` for absent display/export values where needed, never to disguise missing required content. Application-owned final TP-FE/TP-BE IDs use per-layer session counters, remain immutable, continue for additional cases, and may restart at 001 only in a new session.
 

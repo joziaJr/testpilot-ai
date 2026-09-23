@@ -27,6 +27,7 @@ import {
   parsePersistedAnalysisSession,
   REVIEW_SELECTION_SESSION_KEY,
 } from "@/lib/review/review-session";
+import { GENERATION_SESSION_KEY } from "@/lib/generation/generation-session";
 
 type SelectedDocument = FileMetadata & {
   fileType: UploadExtension;
@@ -65,6 +66,7 @@ export function PrdUpload({
   function clearReviewSession() {
     sessionStorage.removeItem(ANALYSIS_SESSION_KEY);
     sessionStorage.removeItem(REVIEW_SELECTION_SESSION_KEY);
+    sessionStorage.removeItem(GENERATION_SESSION_KEY);
   }
 
   useEffect(() => {
@@ -218,7 +220,6 @@ export function PrdUpload({
   }
 
   async function choose(files: File[]) {
-    cancel();
     setError("");
     if (files.length !== 1) {
       setError(uploadMessages.FILE_REQUIRED);
@@ -230,6 +231,14 @@ export function PrdUpload({
       setError(uploadMessages[invalid]);
       return;
     }
+    if (
+      selected &&
+      sessionStorage.getItem(GENERATION_SESSION_KEY) &&
+      !window.confirm("Replace this PRD and clear its generated test cases?")
+    ) {
+      return;
+    }
+    cancel();
     const id = revision.current;
     const controller = new AbortController();
     request.current = controller;

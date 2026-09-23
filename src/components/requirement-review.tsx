@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { TestCasePreview } from "@/components/test-case-preview";
 import type { PrdAnalysis } from "@/lib/analysis/analysis-contract";
 import {
   generatedTestCasesSchema,
@@ -809,20 +810,24 @@ export function RequirementReview({
           </p>
         )}
         {generation.status === "success" && (
-          <div
-            className="mt-4 rounded-xl border border-emerald-300 bg-white p-4 text-sm text-emerald-950"
-            role="status"
-          >
-            <p className="font-semibold">Generation: COMPLETE</p>
-            <p className="mt-2">
-              Frontend test cases: {generation.result.frontend.length}
-            </p>
-            <p>Backend test cases: {generation.result.backend.length}</p>
-            <p className="mt-2 text-slate-700">
-              Structured cases are ready for the future M6 preview. No preview,
-              editing, or export is available in M5.
-            </p>
-          </div>
+          <>
+            <div
+              className="mt-4 rounded-xl border border-emerald-300 bg-white p-4 text-sm text-emerald-950"
+              role="status"
+            >
+              <p className="font-semibold">Generation: COMPLETE</p>
+              <p className="mt-2">
+                Frontend test cases: {generation.result.frontend.length}
+              </p>
+              <p>Backend test cases: {generation.result.backend.length}</p>
+            </div>
+            {contract && (
+              <TestCasePreview
+                result={generation.result}
+                testingScope={contract.testingScope}
+              />
+            )}
+          </>
         )}
       </section>
     </section>

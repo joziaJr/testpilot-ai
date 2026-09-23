@@ -14,6 +14,122 @@ export class FakeAiProvider implements AiProvider {
   async generateAnalysis(
     request: ProviderAnalysisRequest,
   ): Promise<ProviderAnalysisResponse> {
+    if (request.systemInstruction.includes("test-case generator")) {
+      const envelope = JSON.parse(
+        request.userContent.slice(request.userContent.indexOf("{")),
+      ) as {
+        layer: "frontend" | "backend";
+        documentLanguage: "indonesian" | "english";
+        context: {
+          modules: Array<{ id: string }>;
+          features: Array<{ id: string; moduleId: string }>;
+          requirements: Array<{
+            id: string;
+            moduleId: string | null;
+            featureId: string | null;
+            statement: string;
+          }>;
+          businessRules: Array<{ id: string; requirementIds: string[] }>;
+          validations: Array<{ id: string; requirementIds: string[] }>;
+          ambiguities: Array<{ requirementId: string | null }>;
+        };
+      };
+      const ambiguous = new Set(
+        envelope.context.ambiguities
+          .map((item) => item.requirementId)
+          .filter((id): id is string => id !== null),
+      );
+      const requirement = envelope.context.requirements.find(
+        (item) => item.featureId !== null && !ambiguous.has(item.id),
+      );
+      const feature = envelope.context.features.find(
+        (item) => item.id === requirement?.featureId,
+      );
+      if (!requirement || !feature)
+        return {
+          jsonText: JSON.stringify({ testCases: [] }),
+          usage: { inputTokens: 30, outputTokens: 5, totalTokens: 35 },
+        };
+      const ruleIds = envelope.context.businessRules
+        .filter((item) => item.requirementIds.includes(requirement.id))
+        .map((item) => item.id);
+      const validationIds = envelope.context.validations
+        .filter((item) => item.requirementIds.includes(requirement.id))
+        .map((item) => item.id);
+      const base = {
+        moduleId: feature.moduleId,
+        featureId: feature.id,
+        requirementIds: [requirement.id],
+        businessRuleIds: ruleIds,
+        validationIds,
+        preconditions: null,
+        priority: "Medium",
+        automation: "Candidate",
+        notes: null,
+      } as const;
+      const indonesian = envelope.documentLanguage === "indonesian";
+      const testCases = [
+        {
+          ...base,
+          title: indonesian
+            ? envelope.layer === "frontend"
+              ? "Selesaikan perilaku pengguna yang didukung"
+              : "Proses perilaku bisnis yang didukung"
+            : envelope.layer === "frontend"
+              ? "Complete the supported user behavior"
+              : "Process the supported business behavior",
+          steps: [
+            indonesian
+              ? envelope.layer === "frontend"
+                ? `Lakukan perilaku yang didokumentasikan: ${requirement.statement}`
+                : `Kirim data yang memenuhi: ${requirement.statement}`
+              : envelope.layer === "frontend"
+                ? `Perform the documented behavior: ${requirement.statement}`
+                : `Submit data that satisfies: ${requirement.statement}`,
+          ],
+          expectedResult: requirement.statement,
+          type: "Positive",
+        },
+      ];
+      if (validationIds.length) {
+        testCases.push({
+          ...base,
+          title: indonesian
+            ? "Biarkan nilai wajib yang didokumentasikan kosong"
+            : envelope.layer === "frontend"
+              ? "Leave the documented required value empty"
+              : "Process data missing the documented required value",
+          steps: [
+            indonesian
+              ? "Hilangkan nilai yang dinyatakan wajib oleh validasi."
+              : "Omit the value identified as required by the validation.",
+          ],
+          expectedResult: indonesian
+            ? "Validasi nilai wajib yang didokumentasikan diterapkan."
+            : "The documented required-value validation is enforced.",
+          type: "Negative",
+        });
+        testCases.push({
+          ...base,
+          title: indonesian
+            ? "Gunakan spasi untuk nilai wajib yang didokumentasikan"
+            : "Use whitespace for the documented required value",
+          steps: [
+            indonesian
+              ? "Berikan hanya spasi untuk nilai wajib."
+              : "Provide only whitespace for the required value.",
+          ],
+          expectedResult: indonesian
+            ? "Spasi tidak memenuhi aturan nilai wajib yang didokumentasikan."
+            : "Whitespace does not satisfy the documented required-value rule.",
+          type: "Edge",
+        });
+      }
+      return {
+        jsonText: JSON.stringify({ testCases }),
+        usage: { inputTokens: 60, outputTokens: 90, totalTokens: 150 },
+      };
+    }
     const envelope = JSON.parse(
       request.userContent.slice(request.userContent.indexOf("{")),
     ) as {

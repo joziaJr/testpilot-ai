@@ -4,7 +4,7 @@
 
 Prepare future validation against [PRD §33](../product/PRD.md) and [resolved OQ-03/OQ-06/OQ-08/OQ-11–OQ-13](../product/OPEN_QUESTIONS.md). Upload limits, session isolation, transient-only raw retention, server secrets, formula safety, strict JSON, and retry/duplicate prevention are settled. Additional tests assess real implementation safeguards, not accounts, roles, or new product features. No security execution or findings are claimed.
 
-M1 upload safeguards, M2 extraction/parser boundaries and M3 analyzer defenses have automated tests documented in [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), and [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md). The full MVP coverage below remains the broader plan. Use only owned/authorized environments and synthetic data during future execution; external provider infrastructure is outside the target unless separately authorized.
+M1 upload safeguards, M2 extraction/parser boundaries, M3 analyzer defenses and M5 selected-context generation defenses have automated tests documented in [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md), and [M5 Generator](../engineering/M5_TEST_CASE_GENERATOR.md). M5 bounds and strictly validates its request, reconstructs confirmed M4 relationships before provider invocation, sends only selected structured context, and rejects unknown references, duplicates and invalid output. The full MVP coverage below remains the broader plan. Use only owned/authorized environments and synthetic data during future execution; external provider infrastructure is outside the target unless separately authorized.
 
 ## Separate evaluation categories
 

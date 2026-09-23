@@ -68,3 +68,7 @@ M3 adds `AI_CONFIGURATION_ERROR`, `AI_PROVIDER_UNAVAILABLE`, `AI_TIMEOUT`, `AI_R
 ## M4 implementation
 
 M4 adds no server endpoint. Invalid, partial, unknown-ID, or stale session selections are rejected by the client-side Zod/domain contract and cannot be confirmed. Malformed persisted state is ignored and the user can reset, replace, remove, or reanalyze to recover. Need Confirmation is product context rather than a runtime failure and does not block unrelated source-backed selection.
+
+## M5 implementation
+
+M5 reuses the AI error categories and adds `INVALID_SELECTION` for malformed, stale or unconfirmed M4 input plus `GENERATION_FAILED` for a safe non-specific generator failure. Invalid JSON, schema, references and duplicates map to `AI_INVALID_RESPONSE` with no partial result or automatic validation retry. The UI offers an explicit retry and never shows provider details. See [M5 Generator](M5_TEST_CASE_GENERATOR.md).

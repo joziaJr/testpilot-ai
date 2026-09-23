@@ -1,0 +1,11 @@
+Product Requirements Document
+
+Language: English
+Module: Task Management
+Feature: Create Task
+
+Requirement: A user can create a task. Every task belongs to a workspace. A task title is required.
+Validation: Reject task creation when the title is missing.
+Need Confirmation: Roles and permissions for creating tasks are not defined.
+
+No API contract is defined.

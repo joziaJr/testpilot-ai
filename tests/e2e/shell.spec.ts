@@ -443,3 +443,175 @@ test("supports keyboard selection without narrow viewport overflow", async ({
     ),
   ).toBe(true);
 });
+
+async function prepareGeneration(
+  page: import("@playwright/test").Page,
+  scope: "Frontend" | "Backend" | "Frontend + Backend",
+) {
+  await page.goto("/");
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await page.getByRole("button", { name: "Analyze PRD" }).click();
+  await page.getByLabel("Create Task").check();
+  await page.getByLabel(scope, { exact: true }).check();
+  await page
+    .getByRole("button", { name: "Confirm reviewed selection" })
+    .click();
+}
+
+test("generates frontend cases only from a confirmed M4 selection", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: IN PROGRESS")).toBeVisible();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  await expect(page.getByText("Frontend test cases: 3")).toBeVisible();
+  await expect(page.getByText("Backend test cases: 0")).toBeVisible();
+  await expect(page.getByRole("main")).not.toContainText("TP-FE-001");
+
+  await page.getByLabel("Create Task").uncheck();
+  await expect(page.getByText("Generation: COMPLETE")).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.generated-test-cases.v1"),
+    ),
+  ).toBeNull();
+});
+
+test("generates backend cases without inventing an API contract", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Backend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  await expect(page.getByText("Frontend test cases: 0")).toBeVisible();
+  await expect(page.getByText("Backend test cases: 3")).toBeVisible();
+  const stored = await page.evaluate(() =>
+    sessionStorage.getItem("testpilot.generated-test-cases.v1"),
+  );
+  expect(stored).not.toContain("/api/");
+  expect(stored).not.toMatch(/HTTP (200|400|401|403|404|500)/);
+});
+
+test("keeps FE and BE results separate and restores their counts", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await prepareGeneration(page, "Frontend + Backend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  await expect(page.getByText("Frontend test cases: 3")).toBeVisible();
+  await expect(page.getByText("Backend test cases: 3")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Remove file" }).click();
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.generated-test-cases.v1"),
+    ),
+  ).toBeNull();
+});
+
+test("confirms PRD replacement when generated cases would be cleared", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+
+  page.once("dialog", async (dialog) => {
+    expect(dialog.message()).toBe(
+      "Replace this PRD and clear its generated test cases?",
+    );
+    await dialog.dismiss();
+  });
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+
+  page.once("dialog", async (dialog) => {
+    await dialog.accept();
+  });
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await expect(
+    page.getByText("Analysis: READY", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Generation: COMPLETE")).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.generated-test-cases.v1"),
+    ),
+  ).toBeNull();
+});
+
+test("shows a safe generation error and supports explicit retry", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  await page.route("**/api/test-cases/generate", async (route) => {
+    await route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        generation: {
+          status: "failed",
+          error: {
+            code: "AI_PROVIDER_UNAVAILABLE",
+            message: "private provider detail",
+          },
+          usage: [],
+        },
+      }),
+    });
+  });
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "AI generation is temporarily unavailable",
+  );
+  await expect(page.getByRole("main")).not.toContainText(
+    "private provider detail",
+  );
+  await page.unroute("**/api/test-cases/generate");
+  await page
+    .getByRole("button", { name: "Retry Test Case Generation" })
+    .click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+});
+
+test("a late generation response cannot attach to a replacement PRD", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  let release!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  let started!: () => void;
+  const intercepted = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  await page.route("**/api/test-cases/generate", async (route) => {
+    const response = await route.fetch();
+    started();
+    await gate;
+    await route.fulfill({ response });
+  });
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await intercepted;
+  await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
+  await expect(
+    page.getByText("Analysis: READY", { exact: true }),
+  ).toBeVisible();
+  release();
+  await page.unrouteAll({ behavior: "wait" });
+  await expect(page.getByText("Generation: COMPLETE")).toHaveCount(0);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testpilot.generated-test-cases.v1"),
+    ),
+  ).toBeNull();
+});

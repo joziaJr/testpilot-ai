@@ -2,7 +2,7 @@
 
 ## Purpose and status
 
-Plan evaluation of the two AI responsibilities against [PRD §§6–14, 17, 24–26](../product/PRD.md), Business Flow BR-01–BR-07, and [resolved OQ-04/OQ-05/OQ-09–OQ-12](../product/OPEN_QUESTIONS.md). M3 adds the synthetic `M3-2` analyzer corpus and deterministic harness under `qa/test-data/m3`. Test-case generation evaluation remains planned. Output quality and hallucination evaluation remain distinct from functional and [AI security testing](SECURITY_TESTING.md).
+Plan evaluation of the two AI responsibilities against [PRD §§6–14, 17, 24–26](../product/PRD.md), Business Flow BR-01–BR-07, and [resolved OQ-04/OQ-05/OQ-09–OQ-12](../product/OPEN_QUESTIONS.md). M3 adds the synthetic `M3-2` analyzer corpus and deterministic harness under `qa/test-data/m3`. M5 extends `npm run test:ai-eval` with a separate deterministic generation harness covering FE/BE relevance, supported case types, requirement/rule/validation traceability, invention defenses, Need Confirmation safety, duplicates, language, strict structure, prompt-injection separation, executable steps and grounded expected results. Output quality and hallucination evaluation remain distinct from functional and [AI security testing](SECURITY_TESTING.md); fake-provider evidence does not replace controlled live-model semantic review.
 
 ## Evaluation dimensions
 

@@ -8,7 +8,7 @@ Approved direction: one full-stack web application using preferred Next.js, Type
 Browser: upload / review / selection / preview / edit / delete / export
     ↕ application requests and validated data
 Server: file validation → document parser → PRD Analyzer → output validation
-        selected requirements → Test Case Generator → output validation → IDs
+        selected requirements → M5 Test Case Generator → output validation → IDs
                                   ↕
                          AI provider adapter
 ```
@@ -51,4 +51,4 @@ File validation, extraction, AI transport/schema, session, and export are separa
 
 ## Implementation entry conditions
 
-Before implementing later milestones, inspect state and select compatible tools within the approved direction. M3 establishes one server-configurable Gemini adapter and defaults it to the live-validated `gemini-3.5-flash`; no provider selector. M4 creates an identity-bound reviewed-selection contract for later generation. AI calls use analysis, frontend-generation and backend-generation usage actions with missing counters null. No unresolved MVP-blocking Open Questions remain. M5 generation requires separate authorization.
+Before implementing later milestones, inspect state and select compatible tools within the approved direction. M3 establishes one server-configurable Gemini adapter and defaults it to the live-validated `gemini-3.5-flash`; no provider selector. M4 creates an identity-bound reviewed-selection contract. M5 consumes it through selected-only FE/BE generation, strict reference validation and application-owned IDs. AI calls use analysis, frontend-generation and backend-generation usage actions with missing counters null. No unresolved MVP-blocking Open Questions remain. M6 preview requires separate authorization.

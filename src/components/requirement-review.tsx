@@ -3,6 +3,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrdAnalysis } from "@/lib/analysis/analysis-contract";
 import {
+  generatedTestCasesSchema,
+  type GeneratedTestCases,
+} from "@/lib/generation/generation-contract";
+import {
+  GENERATION_SESSION_KEY,
+  parsePersistedGeneration,
+} from "@/lib/generation/generation-session";
+import {
+  generationErrorMessages,
+  type GenerationErrorCode,
+} from "@/lib/generation/generation-errors";
+import {
   buildReviewedSelection,
   canConfirmReview,
   confirmReviewSelection,
@@ -23,6 +35,21 @@ import {
 } from "@/lib/review/review-session";
 
 type Evidence = { excerpt: string; section: string | null };
+type GenerationState =
+  | { status: "idle" }
+  | { status: "generating" }
+  | { status: "success"; result: GeneratedTestCases }
+  | { status: "failed"; message: string };
+
+function selectionKey(state: ReviewSelectionState) {
+  return JSON.stringify({
+    analysisId: state.analysisId,
+    selectedModuleIds: state.selectedModuleIds,
+    selectedFeatureIds: state.selectedFeatureIds,
+    testingScope: state.testingScope,
+    confirmed: state.confirmed,
+  });
+}
 
 function EvidencePanel({ evidence }: { evidence: Evidence }) {
   return (
@@ -305,6 +332,12 @@ export function RequirementReview({
     createReviewSelectionState(analysisId),
   );
   const [hydrated, setHydrated] = useState(false);
+  const [generation, setGeneration] = useState<GenerationState>({
+    status: "idle",
+  });
+  const generationRequest = useRef<AbortController | null>(null);
+  const generationRevision = useRef(0);
+  const generationLifecycle = useRef(0);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(
     () => new Set(analysis.modules[0] ? [analysis.modules[0].id] : []),
   );
@@ -314,12 +347,25 @@ export function RequirementReview({
       const restored = parsePersistedReviewSelection(
         sessionStorage.getItem(REVIEW_SELECTION_SESSION_KEY),
       );
+      let activeState = createReviewSelectionState(analysisId);
       if (
         restored?.analysisId === analysisId &&
         validateReviewSelection(analysis, restored, analysisId).length === 0
       )
-        setState(restored);
-      else setState(createReviewSelectionState(analysisId));
+        activeState = restored;
+      setState(activeState);
+      const restoredGeneration = parsePersistedGeneration(
+        sessionStorage.getItem(GENERATION_SESSION_KEY),
+      );
+      if (
+        restoredGeneration?.analysisId === analysisId &&
+        restoredGeneration.selectionKey === selectionKey(activeState)
+      )
+        setGeneration({
+          status: "success",
+          result: restoredGeneration.result,
+        });
+      else setGeneration({ status: "idle" });
       setHydrated(true);
     }, 0);
     return () => {
@@ -335,6 +381,21 @@ export function RequirementReview({
       );
   }, [hydrated, state]);
 
+  useEffect(() => {
+    const lifecycle = generationLifecycle;
+    const revision = generationRevision;
+    const request = generationRequest;
+    const currentLifecycle = ++lifecycle.current;
+    return () => {
+      queueMicrotask(() => {
+        if (lifecycle.current === currentLifecycle) {
+          revision.current++;
+          request.current?.abort();
+        }
+      });
+    };
+  }, []);
+
   const canConfirm = canConfirmReview(analysis, state, analysisId);
   const contract = useMemo(
     () => buildReviewedSelection(analysis, state, analysisId),
@@ -349,6 +410,69 @@ export function RequirementReview({
       else next.add(moduleId);
       return next;
     });
+  }
+
+  function invalidateGeneration() {
+    generationRevision.current++;
+    generationRequest.current?.abort();
+    generationRequest.current = null;
+    setGeneration({ status: "idle" });
+    sessionStorage.removeItem(GENERATION_SESSION_KEY);
+  }
+
+  function updateSelection(
+    transition: (current: ReviewSelectionState) => ReviewSelectionState,
+  ) {
+    invalidateGeneration();
+    setState(transition);
+  }
+
+  async function generate() {
+    if (!ready || !contract || generation.status === "generating") return;
+    invalidateGeneration();
+    const revision = generationRevision.current;
+    const controller = new AbortController();
+    generationRequest.current = controller;
+    setGeneration({ status: "generating" });
+    try {
+      const response = await fetch("/api/test-cases/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analysisId, analysis, selection: state }),
+        signal: controller.signal,
+      });
+      const body = await response.json();
+      if (revision !== generationRevision.current) return;
+      const outcome = body.generation;
+      if (response.ok && outcome?.status === "success") {
+        const parsed = generatedTestCasesSchema.safeParse(outcome.result);
+        if (!parsed.success) throw new Error("Invalid generation response");
+        const persisted = {
+          analysisId,
+          selectionKey: selectionKey(state),
+          result: parsed.data,
+        };
+        sessionStorage.setItem(
+          GENERATION_SESSION_KEY,
+          JSON.stringify(persisted),
+        );
+        setGeneration({ status: "success", result: parsed.data });
+        return;
+      }
+      const code = outcome?.error?.code as GenerationErrorCode;
+      setGeneration({
+        status: "failed",
+        message: Object.hasOwn(generationErrorMessages, code)
+          ? generationErrorMessages[code]
+          : generationErrorMessages.GENERATION_FAILED,
+      });
+    } catch {
+      if (revision === generationRevision.current)
+        setGeneration({
+          status: "failed",
+          message: generationErrorMessages.GENERATION_FAILED,
+        });
+    }
   }
 
   return (
@@ -439,7 +563,7 @@ export function RequirementReview({
                   name={module.name}
                   status={status}
                   onChange={(checked) =>
-                    setState((current) =>
+                    updateSelection((current) =>
                       toggleModuleSelection(
                         analysis,
                         current,
@@ -518,7 +642,7 @@ export function RequirementReview({
                               type="checkbox"
                               checked={selected}
                               onChange={(event) =>
-                                setState((current) =>
+                                updateSelection((current) =>
                                   toggleFeatureSelection(
                                     analysis,
                                     current,
@@ -596,7 +720,9 @@ export function RequirementReview({
                 value={option.value}
                 checked={state.testingScope === option.value}
                 onChange={() =>
-                  setState((current) => setTestingScope(current, option.value))
+                  updateSelection((current) =>
+                    setTestingScope(current, option.value),
+                  )
                 }
                 className="size-5 accent-blue-600"
               />
@@ -632,7 +758,7 @@ export function RequirementReview({
             type="button"
             disabled={!canConfirm}
             onClick={() =>
-              setState((current) =>
+              updateSelection((current) =>
                 confirmReviewSelection(analysis, current, analysisId),
               )
             }
@@ -642,17 +768,61 @@ export function RequirementReview({
           </button>
           <button
             type="button"
-            onClick={() => setState(createReviewSelectionState(analysisId))}
+            onClick={() =>
+              updateSelection(() => createReviewSelectionState(analysisId))
+            }
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             Reset review
           </button>
         </div>
         {ready && contract && (
-          <p className="mt-4 text-sm text-emerald-900" role="status">
-            Reviewed selection saved for this browser session. M5 generation has
-            not started.
+          <div className="mt-4">
+            <p className="text-sm text-emerald-900" role="status">
+              Reviewed selection saved for this browser session.
+            </p>
+            <button
+              type="button"
+              disabled={generation.status === "generating"}
+              onClick={() => void generate()}
+              className="mt-3 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+            >
+              {generation.status === "generating"
+                ? "Generating…"
+                : generation.status === "failed"
+                  ? "Retry Test Case Generation"
+                  : "Generate Test Cases"}
+            </button>
+          </div>
+        )}
+        {generation.status === "generating" && (
+          <p className="mt-4 text-sm font-medium text-blue-900" role="status">
+            Generation: IN PROGRESS
           </p>
+        )}
+        {generation.status === "failed" && (
+          <p
+            className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900"
+            role="alert"
+          >
+            Generation: FAILED — {generation.message}
+          </p>
+        )}
+        {generation.status === "success" && (
+          <div
+            className="mt-4 rounded-xl border border-emerald-300 bg-white p-4 text-sm text-emerald-950"
+            role="status"
+          >
+            <p className="font-semibold">Generation: COMPLETE</p>
+            <p className="mt-2">
+              Frontend test cases: {generation.result.frontend.length}
+            </p>
+            <p>Backend test cases: {generation.result.backend.length}</p>
+            <p className="mt-2 text-slate-700">
+              Structured cases are ready for the future M6 preview. No preview,
+              editing, or export is available in M5.
+            </p>
+          </div>
         )}
       </section>
     </section>

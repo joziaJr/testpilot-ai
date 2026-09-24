@@ -2,7 +2,11 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { GeneratedTestCases } from "../lib/generation/generation-contract";
-import { TestCasePreview, testCaseColumns } from "./test-case-preview";
+import {
+  EditTestCasePanel,
+  TestCasePreview,
+  testCaseColumns,
+} from "./test-case-preview";
 
 type GeneratedCase = GeneratedTestCases["frontend"][number];
 
@@ -38,7 +42,11 @@ function render(
   testingScope: "frontend" | "backend" | "both",
 ) {
   return renderToStaticMarkup(
-    createElement(TestCasePreview, { result, testingScope }),
+    createElement(TestCasePreview, {
+      result,
+      testingScope,
+      onResultChange: () => undefined,
+    }),
   );
 }
 
@@ -131,5 +139,33 @@ describe("TestCasePreview", () => {
       "&lt;script&gt;globalThis.previewPwned = true&lt;/script&gt;",
     );
     expect(markup).not.toContain("<script>");
+  });
+
+  it("exposes scoped manual edit and delete controls without changing columns", () => {
+    const markup = render(
+      { frontend: [generatedCase("TP-FE-001")], backend: [] },
+      "frontend",
+    );
+    expect(markup).toContain("M7 manual review");
+    expect(markup).toContain("Edit TP-FE-001");
+    expect(markup).toContain("Delete TP-FE-001");
+    expect(markup).toContain("do not call AI");
+    expect(testCaseColumns).toHaveLength(11);
+  });
+
+  it("prefills source-linked Module and Feature as read-only", () => {
+    const item = generatedCase("TP-FE-001");
+    const markup = renderToStaticMarkup(
+      createElement(EditTestCasePanel, {
+        item,
+        onCancel: () => undefined,
+        onSave: () => null,
+      }),
+    );
+    expect(markup).toContain("Module (source-linked, read-only)");
+    expect(markup).toContain("Feature (source-linked, read-only)");
+    expect(markup).toContain('value="Task Management"');
+    expect(markup).toContain('value="Create Task"');
+    expect(markup.match(/readonly/gi) ?? []).toHaveLength(2);
   });
 });

@@ -78,6 +78,10 @@ PRD sections 7–8/24.2/28–29/33–35, Business Flow Requirement Review, and O
 
 PRD sections 6/9–14/17–18/24.3/25–29/33–35, Business Flow generation, and OQ-04/OQ-05/OQ-09–OQ-13 map M3 requirement IDs through the confirmed M4 selection to internal references on every M5 generated case. [M5 FE specifications](../../qa/test-cases/frontend/M5_TEST_CASE_GENERATOR.md), [M5 backend/API specifications](../../qa/test-cases/backend/M5_TEST_CASE_GENERATOR.md), generator unit/integration tests, deterministic generation evaluation, and browser tests provide automated coverage. [M5 Generator](../engineering/M5_TEST_CASE_GENERATOR.md) defines the exact contract. M6 preview/edit/delete and export coverage are not claimed.
 
-## M6 implementation
+## M7 implementation
+
+PRD sections 18–20/24.4/29/33–35, BR-02/BR-05, Business Flow QA Review, and OQ-06/OQ-09/OQ-13 map to the [M7 FE specifications](../../qa/test-cases/frontend/M7_EDIT_DELETE.md), [M7 backend-boundary specifications](../../qa/test-cases/backend/M7_EDIT_DELETE.md), deterministic mutation/component tests, and browser lifecycle/accessibility/security tests. [M7 Edit/Delete](../engineering/M7_EDIT_DELETE.md) defines mutable fields, source-linked read-only Module/Feature labels, immutable source/ID metadata, confirmation, stable ID gaps, layer isolation, session persistence, and invalidation. M7 adds no backend route, AI request, regeneration, column selection, export, execution result, or bug record.
+
+## M6 implementation (historical preview boundary)
 
 PRD sections 15–18/24.4/27–29/33–35 and Business Flow Test Case Preview map the validated M5 result to the [M6 FE preview specifications](../../qa/test-cases/frontend/M6_TEST_CASE_PREVIEW.md), [M6 backend-boundary specifications](../../qa/test-cases/backend/M6_TEST_CASE_PREVIEW.md), deterministic render tests and browser lifecycle/accessibility/security tests. The backend-boundary cases verify reuse of the validated M5 result and absence of a new preview route/provider call; they do not claim that M6 adds backend behavior. [M6 Preview](../engineering/M6_TEST_CASE_PREVIEW.md) defines the exact display contract. M7 edit/delete, M8 column selection and M9 export coverage are not claimed.

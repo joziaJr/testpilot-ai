@@ -1,5 +1,9 @@
 # Security Testing Strategy
 
+## M7 security focus
+
+Treat every manually edited value as untrusted text. Verify script-like content remains inert, no raw HTML or Markdown interpretation occurs, schema length/enums constrain saved data, immutable IDs/source references cannot be edited, source-linked Module/Feature mismatches are rejected, and optional fields normalize safely. Inspect browser requests and repository code to confirm Save/Delete cannot access AI credentials, call provider/generation routes, or log prompts, raw responses, or source PRD content. Session storage remains same-origin active-session state and is cleared by established invalidation paths.
+
 ## Purpose and scope
 
 Prepare future validation against [PRD §33](../product/PRD.md) and [resolved OQ-03/OQ-06/OQ-08/OQ-11–OQ-13](../product/OPEN_QUESTIONS.md). Upload limits, session isolation, transient-only raw retention, server secrets, formula safety, strict JSON, and retry/duplicate prevention are settled. Additional tests assess real implementation safeguards, not accounts, roles, or new product features. No security execution or findings are claimed.

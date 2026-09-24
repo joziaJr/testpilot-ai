@@ -1,5 +1,9 @@
 # Error Handling
 
+## M7 edit/delete handling
+
+M7 validates the complete editable field set before Save. Required blank/invalid fields and duplicate same-layer scenarios keep the editor open, show a safe user-facing alert, and leave the saved case untouched. Cancel discards the draft. Delete requires explicit confirmation; dismissal is a no-op. A stale or missing case cannot be edited or deleted through the mutation contract. Deleting the final case is a valid empty layer, not an error. No provider retry or server error path is introduced because M7 performs no request.
+
 ## Purpose and status
 
 Required errors come from [PRD §§27, 33](../product/PRD.md), [Business Flow §3](../product/BUSINESS_FLOW.md), and [resolved OQ-03/OQ-05/OQ-06/OQ-12](../product/OPEN_QUESTIONS.md). Recovery policies below now reflect approved decisions. No TestPilot endpoint/status contract is invented.

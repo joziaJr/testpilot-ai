@@ -687,6 +687,127 @@ test("renders hostile generated preview content as inert text", async ({
   ).toBeUndefined();
 });
 
+test("edits, validates, cancels, persists and invalidates a test case without another AI request", async ({
+  page,
+}) => {
+  let generationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/test-cases/generate"))
+      generationRequests++;
+  });
+  await prepareGeneration(page, "Frontend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  const requestsAfterGeneration = generationRequests;
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  const originalTitle = "Complete the supported user behavior";
+
+  await preview.getByRole("button", { name: "Edit TP-FE-001" }).click();
+  let editor = page.getByRole("region", { name: "Edit TP-FE-001" });
+  await expect(editor.getByLabel("Title")).toHaveValue(originalTitle);
+  await expect(
+    editor.getByLabel("Module (source-linked, read-only)"),
+  ).toHaveAttribute("readonly", "");
+  await expect(
+    editor.getByLabel("Feature (source-linked, read-only)"),
+  ).toHaveAttribute("readonly", "");
+  await editor.getByLabel("Title").fill("Cancelled change");
+  await editor.getByRole("button", { name: "Cancel" }).click();
+  await expect(preview.getByText(originalTitle, { exact: true })).toBeVisible();
+
+  await preview.getByRole("button", { name: "Edit TP-FE-001" }).click();
+  editor = page.getByRole("region", { name: "Edit TP-FE-001" });
+  await editor.getByLabel("Title").fill("");
+  await editor.getByRole("button", { name: "Save changes" }).click();
+  await expect(editor.getByRole("alert")).toContainText("title is required");
+
+  const hostile = "<script>window.__editPwned = true</script>";
+  await editor.getByLabel("Title").fill(hostile);
+  await editor.getByRole("button", { name: "Add step" }).click();
+  await editor.getByLabel("Step 2").fill("Review the documented outcome.");
+  await editor.getByRole("button", { name: "Save changes" }).click();
+  await expect(preview.getByText(hostile, { exact: true })).toBeVisible();
+  expect(generationRequests).toBe(requestsAfterGeneration);
+  expect(
+    await page.evaluate(
+      () => (window as typeof window & { __editPwned?: boolean }).__editPwned,
+    ),
+  ).toBeUndefined();
+
+  await page.reload();
+  await expect(
+    page
+      .getByRole("region", { name: "Generated Test Cases" })
+      .getByText(hostile, { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  await expect(page.getByText(hostile, { exact: true })).toHaveCount(0);
+});
+
+test("requires delete confirmation, preserves ID gaps and supports an empty layer", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+
+  page.once("dialog", async (dialog) => {
+    expect(dialog.message()).toContain("Delete TP-FE-002?");
+    await dialog.dismiss();
+  });
+  await preview.getByRole("button", { name: "Delete TP-FE-002" }).click();
+  await expect(preview).toContainText("TP-FE-002");
+
+  page.once("dialog", async (dialog) => dialog.accept());
+  await preview.getByRole("button", { name: "Delete TP-FE-002" }).click();
+  await expect(preview).not.toContainText("TP-FE-002");
+  await expect(preview).toContainText("TP-FE-001");
+  await expect(preview).toContainText("TP-FE-003");
+  await expect(page.getByText("Frontend test cases: 2")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("Frontend test cases: 2")).toBeVisible();
+  await expect(page.getByText("TP-FE-002")).toHaveCount(0);
+
+  for (const id of ["TP-FE-001", "TP-FE-003"]) {
+    page.once("dialog", async (dialog) => dialog.accept());
+    await page.getByRole("button", { name: `Delete ${id}` }).click();
+  }
+  await expect(page.getByText("Frontend test cases: 0")).toBeVisible();
+  await expect(preview).toContainText(
+    "No Frontend test cases were generated from the selected documented requirements",
+  );
+});
+
+test("keeps frontend edits and backend deletes isolated in Both scope", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await prepareGeneration(page, "Frontend + Backend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  await preview.getByRole("button", { name: "Edit TP-FE-001" }).click();
+  const editor = page.getByRole("region", { name: "Edit TP-FE-001" });
+  await editor.getByLabel("Title").fill("Frontend-only manual edit");
+  await editor.getByRole("button", { name: "Save changes" }).click();
+
+  await preview.getByRole("tab", { name: "Backend (3)" }).click();
+  await expect(preview).not.toContainText("Frontend-only manual edit");
+  page.once("dialog", async (dialog) => dialog.accept());
+  await preview.getByRole("button", { name: "Delete TP-BE-001" }).click();
+  await expect(preview.getByRole("tab", { name: "Backend (2)" })).toBeVisible();
+  await expect(preview).not.toContainText("TP-BE-001");
+
+  await preview.getByRole("tab", { name: "Frontend (3)" }).click();
+  await expect(preview).toContainText("Frontend-only manual edit");
+  await expect(preview).toContainText("TP-FE-001");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("a late generation response cannot attach to a replacement PRD", async ({
   page,
 }) => {

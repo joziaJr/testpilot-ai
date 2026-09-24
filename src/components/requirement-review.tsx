@@ -428,6 +428,19 @@ export function RequirementReview({
     setState(transition);
   }
 
+  function updateGeneratedResult(result: GeneratedTestCases) {
+    if (generation.status !== "success") return;
+    sessionStorage.setItem(
+      GENERATION_SESSION_KEY,
+      JSON.stringify({
+        analysisId,
+        selectionKey: selectionKey(state),
+        result,
+      }),
+    );
+    setGeneration({ status: "success", result });
+  }
+
   async function generate() {
     if (!ready || !contract || generation.status === "generating") return;
     invalidateGeneration();
@@ -825,6 +838,7 @@ export function RequirementReview({
               <TestCasePreview
                 result={generation.result}
                 testingScope={contract.testingScope}
+                onResultChange={updateGeneratedResult}
               />
             )}
           </>

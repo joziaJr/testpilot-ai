@@ -1,5 +1,11 @@
 # Regression Checklist
 
+## M7 focus
+
+- Re-run M1 upload/removal/replacement, M2 extraction, M3 analysis, M4 selection, M5 generation/error/identity, and M6 exact-column/layer/empty/rendering coverage.
+- Confirm saved M7 mutations survive only a matching active session and clear on regeneration or existing selection/source invalidation.
+- Confirm deletion never renumbers IDs and editing cannot change source metadata or invoke the provider.
+
 ## Purpose and current status
 
 Plan repeat validation after changes. This checklist is unexecuted and contains no test results. Record the candidate and previous baseline builds, source/fixture revisions, provider/model, prompt/schema versions, and the changed areas before selecting cases.

@@ -63,3 +63,7 @@ M5 sends only selected structured analysis context and relevant evidence, not th
 ## M6 implementation
 
 M6 renders validated generated strings only through React text nodes and uses no raw HTML or Markdown execution. Internal source references, prompts, provider responses and secrets are not displayed. Hostile script-like content is covered by deterministic render and browser tests and remains inert visible text. See [M6 Preview](M6_TEST_CASE_PREVIEW.md).
+
+## M7 implementation
+
+M7 treats edited values as untrusted text, revalidates them against the bounded generated-case field schema, and continues to render only React text nodes. Test Case ID and source references are excluded from editing; Module and Feature are read-only and checked again at the mutation boundary against their canonical current values. Save/Delete use no route, provider, environment variable, prompt, or raw response; they replace only the validated active-session result. Automated browser coverage verifies script-like edits remain inert and mutation actions do not produce generation requests. See [M7 Edit/Delete](M7_EDIT_DELETE.md).

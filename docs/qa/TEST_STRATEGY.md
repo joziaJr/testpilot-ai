@@ -1,8 +1,12 @@
 # Test Strategy
 
+## M7 coverage addition
+
+M7 combines pure mutation tests with static component rendering and Playwright workflows. Coverage verifies schema-valid Save, source-compatible canonical Module/Feature labels, incompatible-label rejection, invalid/duplicate rejection, Cancel, confirmed Delete, immutable IDs/source references, non-renumbering, final empty layers, active-session restoration/invalidation, FE/BE isolation, accessibility, responsive containment, inert hostile edited text, and absence of mutation-time AI/network behavior. Existing M1–M6 suites remain regression gates; no live-model test is required because M7 is deterministic and makes no AI call.
+
 ## Purpose and status
 
-Define how functional and failure behavior will be assessed. M0 environment checks, M1 upload validation, M2 extraction, M3 analyzer tests, M4 review tests, M5 generator tests, and M6 deterministic render/browser preview tests are implemented. See [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md), [M4 Review](../engineering/M4_REQUIREMENT_REVIEW.md), [M5 Generator](../engineering/M5_TEST_CASE_GENERATOR.md), and [M6 Preview](../engineering/M6_TEST_CASE_PREVIEW.md) for precise coverage and limitations. Deterministic provider tests remain separate from non-deterministic live-model quality review. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles.
+Define how functional and failure behavior will be assessed. M0 environment checks through M7 deterministic edit/delete tests are implemented. See the milestone engineering documents through [M7 Edit/Delete](../engineering/M7_EDIT_DELETE.md) for precise coverage and limitations. Deterministic provider tests remain separate from non-deterministic live-model quality review. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles.
 
 ## Testing levels
 

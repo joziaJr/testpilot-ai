@@ -50,4 +50,4 @@ The table uses a caption, semantic column headers and ordered lists. Both uses `
 
 - Wide tables intentionally require horizontal scrolling on small screens.
 - Both restores to the Frontend tab rather than persisting the last viewed tab.
-- M6 is read-only. Edit/Delete belongs to M7, column selection to M8 and TSV export to M9.
+- M6 remains the historical read-only preview boundary. M7 now layers manual edit/delete onto its accepted result; column selection remains M8 and TSV export M9.

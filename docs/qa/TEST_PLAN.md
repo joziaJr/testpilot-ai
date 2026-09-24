@@ -1,8 +1,12 @@
 # MVP Test Plan
 
+## M7 edit/delete scope
+
+Validate the generated-result working copy through the cases in `qa/test-cases/frontend/M7_EDIT_DELETE.md` and `qa/test-cases/backend/M7_EDIT_DELETE.md`. Exercise the eight mutable fields, source-linked read-only Module/Feature labels, incompatible-label rejection, add/remove Steps, required-field and duplicate rejection, Save/Cancel, delete accept/dismiss, stable gaps, zero remaining cases, Both-layer isolation, refresh persistence, upstream invalidation, hostile text, and narrow-width keyboard usability. Confirm there is no M7 endpoint, provider request, regeneration, export, column selection, execution result, or bug workflow.
+
 ## Purpose and evidence status
 
-This business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the runners; M1 adds upload validation; M2 adds extraction; M3 adds server-side structured PRD analysis and deterministic analyzer evaluation; M4 adds evidence review, module/feature selection, scope choice, and same-session continuity; M5 adds selected-context FE/BE generation, strict validation, traceability and deterministic IDs; M6 adds read-only separated FE/BE preview. The inventory below describes the full MVP, with implemented details in [M1 Upload](../engineering/M1_UPLOAD.md), [M2 Extraction](../engineering/M2_EXTRACTION.md), [M3 Analyzer](../engineering/M3_AI_PRD_ANALYZER.md), [M4 Review](../engineering/M4_REQUIREMENT_REVIEW.md), [M5 Generator](../engineering/M5_TEST_CASE_GENERATOR.md), and [M6 Preview](../engineering/M6_TEST_CASE_PREVIEW.md). No Actual Result or execution Status is assigned to unexecuted cases.
+This business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the runners; M1 adds upload validation; M2 extraction; M3 structured PRD analysis; M4 review and selection; M5 grounded FE/BE generation; M6 separated preview; and M7 manual edit/delete. Implemented details are documented through [M7 Edit/Delete](../engineering/M7_EDIT_DELETE.md). No Actual Result or execution Status is assigned to unexecuted cases.
 
 Turn planning items into cases only with source-backed expectations. The [approved OQ-03–OQ-14 decisions](../product/OPEN_QUESTIONS.md) now provide upload, language, eligibility, session, schema, TSV, retry, privacy, and release oracles. No unresolved MVP-blocking Open Questions remain. TestPilot's 10 MB limit must not be inferred for another uploaded target PRD.
 

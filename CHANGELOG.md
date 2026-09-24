@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.7.0](https://github.com/joziaJr/testpilot-ai/compare/v0.6.0...v0.7.0) (2026-09-24)
+
+
+### Features
+
+* add test case edit and delete ([1241ddf](https://github.com/joziaJr/testpilot-ai/commit/1241ddf3a8d8acdc18826e7daf6da398c1557dff))
+* add test case edit and delete ([6d63fe9](https://github.com/joziaJr/testpilot-ai/commit/6d63fe931907e26043c1cbce6483429f04e5ac73))
+
 ## [0.6.0](https://github.com/joziaJr/testpilot-ai/compare/v0.5.0...v0.6.0) (2026-09-24)
 
 

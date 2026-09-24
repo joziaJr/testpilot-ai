@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.0](https://github.com/joziaJr/testpilot-ai/compare/v0.5.0...v0.6.0) (2026-09-24)
+
+
+### Features
+
+* add AI test case generator ([943b2ff](https://github.com/joziaJr/testpilot-ai/commit/943b2ffaf6973934118f82f368ab682a7e4583b3))
+* add AI test case generator ([aa2c132](https://github.com/joziaJr/testpilot-ai/commit/aa2c1320c73b4bd090dae7cb536bc0bddd847e32))
+* add test case preview ([c6b8dab](https://github.com/joziaJr/testpilot-ai/commit/c6b8dab04a3644d1cb5b848cef02832cde62d8af))
+* add test case preview ([c76a446](https://github.com/joziaJr/testpilot-ai/commit/c76a4463c234a686d669019c9bbf5f62e14c61b5))
+
 ## [0.5.0](https://github.com/joziaJr/testpilot-ai/compare/v0.4.0...v0.5.0) (2026-09-22)
 
 

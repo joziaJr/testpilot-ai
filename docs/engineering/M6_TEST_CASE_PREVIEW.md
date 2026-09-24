@@ -43,6 +43,7 @@ The table uses a caption, semantic column headers and ordered lists. Both uses `
 
 - Deterministic render tests: exact columns, FE-only, BE-only, Both separation/counts, stable IDs/order, ordered steps, long content, nullable placeholders, empty layers, hostile strings and input immutability.
 - E2E: generated FE/BE previews, all headers, ordered steps, accessible tab switching without another generation request, independent IDs, empty Backend layer, selection/scope/removal/replacement invalidation, refresh restoration, narrow viewport and inert hostile content.
+- QA specifications: frontend display/lifecycle behavior and backend-boundary assertions covering validated-result reuse, network isolation and a valid empty Backend collection. M6 still adds no backend route.
 - Regression: existing M1-M5 unit, E2E and AI-evaluation suites remain authoritative for upstream behavior.
 
 ## Known limitations

@@ -77,3 +77,7 @@ PRD sections 7–8/24.2/28–29/33–35, Business Flow Requirement Review, and O
 ## M5 implementation
 
 PRD sections 6/9–14/17–18/24.3/25–29/33–35, Business Flow generation, and OQ-04/OQ-05/OQ-09–OQ-13 map M3 requirement IDs through the confirmed M4 selection to internal references on every M5 generated case. [M5 FE specifications](../../qa/test-cases/frontend/M5_TEST_CASE_GENERATOR.md), [M5 backend/API specifications](../../qa/test-cases/backend/M5_TEST_CASE_GENERATOR.md), generator unit/integration tests, deterministic generation evaluation, and browser tests provide automated coverage. [M5 Generator](../engineering/M5_TEST_CASE_GENERATOR.md) defines the exact contract. M6 preview/edit/delete and export coverage are not claimed.
+
+## M6 implementation
+
+PRD sections 15–18/24.4/27–29/33–35 and Business Flow Test Case Preview map the validated M5 result to the [M6 FE preview specifications](../../qa/test-cases/frontend/M6_TEST_CASE_PREVIEW.md), deterministic render tests and browser lifecycle/accessibility/security tests. [M6 Preview](../engineering/M6_TEST_CASE_PREVIEW.md) defines the exact display contract. M6 adds no backend route, so no backend case specification is fabricated. M7 edit/delete, M8 column selection and M9 export coverage are not claimed.

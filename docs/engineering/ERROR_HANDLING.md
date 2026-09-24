@@ -72,3 +72,7 @@ M4 adds no server endpoint. Invalid, partial, unknown-ID, or stale session selec
 ## M5 implementation
 
 M5 reuses the AI error categories and adds `INVALID_SELECTION` for malformed, stale or unconfirmed M4 input plus `GENERATION_FAILED` for a safe non-specific generator failure. Invalid JSON, schema, references and duplicates map to `AI_INVALID_RESPONSE` with no partial result or automatic validation retry. The UI offers an explicit retry and never shows provider details. See [M5 Generator](M5_TEST_CASE_GENERATOR.md).
+
+## M6 implementation
+
+M6 introduces no request or error category. Preview appears only for a successful validated M5 state. A selected layer with zero generated cases is rendered as a valid explanatory empty state, not an application failure. Existing M5 invalidation and safe failure behavior remain authoritative. See [M6 Preview](M6_TEST_CASE_PREVIEW.md).

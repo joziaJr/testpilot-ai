@@ -2,7 +2,7 @@
 
 ## Status and boundary
 
-Implemented on `feat/test-case-generator`. M5 consumes the validated M3 analysis and a confirmed M4 selection, produces strictly validated FE and/or BE cases, and stops at a generation-complete count summary. M6 preview, editing, deletion, regeneration and all export behavior remain unimplemented.
+M5 consumes the validated M3 analysis and a confirmed M4 selection, produces strictly validated FE and/or BE cases, and ends at a generation-complete result and count summary. The separately implemented [M6 Preview](M6_TEST_CASE_PREVIEW.md) now renders that result; editing, deletion, regeneration and all export behavior remain later milestones.
 
 ```text
 M3 structured analysis + confirmed M4 state
@@ -33,7 +33,7 @@ Every generated draft references one selected feature and at least one selected 
 
 The provider returns no human-readable Test Case ID. A draft contains module/feature IDs, unique source references, title, nullable preconditions, ordered steps, expected result, High/Medium/Low priority, Positive/Negative/Edge type, nullable Yes/No/Candidate automation and nullable notes. Test Data is not a field.
 
-After validation, application code resolves documented module/feature names, retains references as internal `source` metadata, and independently assigns `TP-FE-001...` and `TP-BE-001...`. IDs are deterministic for accepted array order. M6 deletion/counter continuation behavior is intentionally absent.
+After validation, application code resolves documented module/feature names, retains references as internal `source` metadata, and independently assigns `TP-FE-001...` and `TP-BE-001...`. IDs are deterministic for accepted array order. M7 deletion/counter continuation behavior is intentionally absent.
 
 Priority defaults to Medium. High or Low is permitted only when selected source context explicitly supports that impact. Automation defaults to Candidate unless context justifies another approved value; it never claims that TestPilot generated an automation script. Null optional values remain null internally; presentation placeholders belong to M6/M7.
 
@@ -72,13 +72,13 @@ The review found no application bug, prompt/schema issue or model-quality varian
 
 ## Security, privacy and limitations
 
-Only selected structured context reaches the provider. Raw PRDs, full prompts and raw provider responses are not logged or persisted. React renders status text safely; the full generated content is not rendered until M6. Request and provider response sizes are bounded, schemas are strict, and production rejects the fake provider.
+Only selected structured context reaches the provider. Raw PRDs, full prompts and raw provider responses are not logged or persisted. M6 renders validated generated content safely through React text nodes. Request and provider response sizes are bounded, schemas are strict, and production rejects the fake provider.
 
 Known limitations:
 
 - Deterministic validation cannot prove every natural-language interpretation is semantically grounded; QA review in M6 remains required.
 - Browser session storage is accessible to same-origin script and disappears with the tab session.
 - A selected layer can validly produce zero cases rather than fabricate unsupported behavior.
-- M5 assigns IDs for the initial accepted result only; later counter/deletion behavior belongs to M6.
+- M5 assigns IDs for the initial accepted result only; later counter/deletion behavior belongs to M7.
 - Deterministic fake evaluation is not a penetration test or general live-model quality claim.
 - Live review covers one intentionally small synthetic English PRD; broader languages and requirement shapes can still exhibit provider/model variance.

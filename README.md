@@ -4,7 +4,7 @@ TestPilot AI is an MVP for turning a PRD into reviewable Frontend (FE) and Backe
 
 ## Current project status
 
-M0 establishes the application and quality foundation. M1 implements PRD upload and server-authoritative validation, M2 implements deterministic TXT/PDF/DOCX extraction, M3 implements server-side Gemini PRD analysis with strict grounding and structured validation, M4 implements human requirement review and module/feature selection, and M5 implements selected-context FE/BE test-case generation with strict validation and deterministic IDs. See [M1 Upload](docs/engineering/M1_UPLOAD.md), [M2 Extraction](docs/engineering/M2_EXTRACTION.md), [M3 Analyzer](docs/engineering/M3_AI_PRD_ANALYZER.md), [M4 Review](docs/engineering/M4_REQUIREMENT_REVIEW.md), and [M5 Generator](docs/engineering/M5_TEST_CASE_GENERATOR.md). Full preview/edit/delete and export remain unimplemented. The current release-managed package version is `0.4.0`; this feature branch does not bump it.
+M0 establishes the application and quality foundation. M1 implements PRD upload and server-authoritative validation, M2 implements deterministic TXT/PDF/DOCX extraction, M3 implements server-side Gemini PRD analysis with strict grounding and structured validation, M4 implements human requirement review and module/feature selection, M5 implements selected-context FE/BE test-case generation with strict validation and deterministic IDs, and M6 implements the read-only test-case preview. See [M1 Upload](docs/engineering/M1_UPLOAD.md), [M2 Extraction](docs/engineering/M2_EXTRACTION.md), [M3 Analyzer](docs/engineering/M3_AI_PRD_ANALYZER.md), [M4 Review](docs/engineering/M4_REQUIREMENT_REVIEW.md), [M5 Generator](docs/engineering/M5_TEST_CASE_GENERATOR.md), and [M6 Preview](docs/engineering/M6_TEST_CASE_PREVIEW.md). Edit/delete and export remain unimplemented. The current release-managed package version is `0.5.0`; this feature branch does not bump it.
 
 The [PRD](docs/product/PRD.md) and [Business Flow](docs/product/BUSINESS_FLOW.md), both labeled **1.0 Draft / Approved Baseline for Development**, remain authoritative and unchanged. The [approved decisions OQ-03–OQ-14](docs/product/OPEN_QUESTIONS.md) clarify the implementation baseline. All twelve are resolved; their original subjects, final decisions, approval source, and affected docs remain traceable. The older task brief is historical context only.
 
@@ -32,10 +32,10 @@ Accounts, collaboration, project/history management, Jira/GitHub product integra
 | [docs/product](docs/product/)                                                                     | Product authority, flow, scope, source gaps                           |
 | [docs/engineering](docs/engineering/)                                                             | Implementation recommendations and agent rules                        |
 | [docs/qa](docs/qa/)                                                                               | Strategy, plan, case/data/bug standards, traceability, release checks |
-| [qa/test-cases/frontend](qa/test-cases/frontend/) / [backend](qa/test-cases/backend/)             | M1–M5 FE/BE specifications and future cases                           |
+| [qa/test-cases/frontend](qa/test-cases/frontend/) / [backend](qa/test-cases/backend/)             | M1–M6 FE/BE specifications and future cases                           |
 | [qa/test-execution/frontend](qa/test-execution/frontend/) / [backend](qa/test-execution/backend/) | Actual execution records, kept separate from specifications           |
 | [qa/bug-reports/frontend](qa/bug-reports/frontend/) / [backend](qa/bug-reports/backend/)          | Observed defects only                                                 |
-| [qa/test-data](qa/test-data/)                                                                     | Synthetic documented M1–M5 fixtures                                   |
+| [qa/test-data](qa/test-data/)                                                                     | Synthetic documented M1–M5 fixtures reused through M6                 |
 | [qa/automation](qa/automation/)                                                                   | Automation conventions; executable tests live in src and tests        |
 
 ## Prerequisites
@@ -86,7 +86,7 @@ Install the Playwright browser once with `npx playwright install chromium`. CI i
 | `.github/workflows/` | CI and Release Please automation                             |
 | `.husky/`            | Local commit and push quality gates                          |
 
-Business-service directories are added only by their implementing milestone; the M5 generator exists, while preview/edit/delete and export layers do not.
+Business-service directories are added only by their implementing milestone; M5 generation and M6 read-only preview exist, while edit/delete and export layers do not.
 
 ## Contribution and release flow
 
@@ -94,4 +94,4 @@ Read docs → understand current state → check scope → inspect code → plan
 
 Use a feature branch and Conventional Commits. Pre-commit runs staged lint/format checks, commit-msg runs Commitlint, and pre-push runs typecheck plus unit tests. GitHub Actions repeats validation and E2E. After merge to `main`, Release Please manages release pull requests and v-prefixed tags; it does not bump versions on local pushes. See [Versioning and Release](docs/engineering/VERSIONING_RELEASE.md).
 
-**No unresolved MVP-blocking Open Questions.** M5 implements structured generation and a count summary only. The next milestone is **M6: Test Case Preview**, under separate authorization.
+**No unresolved MVP-blocking Open Questions.** M6 implements read-only FE/BE preview only. The next milestone is **M7: Edit & Delete Test Cases**, under separate authorization.

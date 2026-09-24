@@ -59,3 +59,7 @@ M4 renders all AI/source strings through React text nodes and introduces no HTML
 ## M5 implementation
 
 M5 sends only selected structured analysis context and relevant evidence, not the entire extracted PRD. Its route validates a bounded strict request and confirmed M4 relationships before invoking the provider. Generated strings remain untrusted, are stored only for the active browser session, and are not rendered as HTML. See [M5 Generator](M5_TEST_CASE_GENERATOR.md).
+
+## M6 implementation
+
+M6 renders validated generated strings only through React text nodes and uses no raw HTML or Markdown execution. Internal source references, prompts, provider responses and secrets are not displayed. Hostile script-like content is covered by deterministic render and browser tests and remains inert visible text. See [M6 Preview](M6_TEST_CASE_PREVIEW.md).

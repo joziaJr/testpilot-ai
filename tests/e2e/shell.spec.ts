@@ -467,10 +467,35 @@ test("generates frontend cases only from a confirmed M4 selection", async ({
   await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
   await expect(page.getByText("Frontend test cases: 3")).toBeVisible();
   await expect(page.getByText("Backend test cases: 0")).toBeVisible();
-  await expect(page.getByRole("main")).not.toContainText("TP-FE-001");
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  await expect(preview).toBeVisible();
+  await expect(preview).toContainText("TP-FE-001");
+  await expect(preview).toContainText("TP-FE-002");
+  await expect(preview).toContainText("TP-FE-003");
+  for (const column of [
+    "Test Case ID",
+    "Module",
+    "Feature",
+    "Title",
+    "Preconditions",
+    "Steps",
+    "Expected Result",
+    "Priority",
+    "Type",
+    "Automation",
+    "Notes",
+  ]) {
+    await expect(
+      preview.getByRole("columnheader", { name: column, exact: true }),
+    ).toBeVisible();
+  }
+  await expect(preview.locator("ol > li").first()).toContainText(
+    "Perform the documented behavior",
+  );
 
   await page.getByLabel("Create Task").uncheck();
   await expect(page.getByText("Generation: COMPLETE")).toHaveCount(0);
+  await expect(preview).toHaveCount(0);
   expect(
     await page.evaluate(() =>
       sessionStorage.getItem("testpilot.generated-test-cases.v1"),
@@ -486,30 +511,61 @@ test("generates backend cases without inventing an API contract", async ({
   await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
   await expect(page.getByText("Frontend test cases: 0")).toBeVisible();
   await expect(page.getByText("Backend test cases: 3")).toBeVisible();
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  await expect(preview).toContainText("TP-BE-001");
+  await expect(preview).not.toContainText("TP-FE-001");
   const stored = await page.evaluate(() =>
     sessionStorage.getItem("testpilot.generated-test-cases.v1"),
   );
   expect(stored).not.toContain("/api/");
   expect(stored).not.toMatch(/HTTP (200|400|401|403|404|500)/);
+  await page.getByLabel("Frontend", { exact: true }).check();
+  await expect(preview).toHaveCount(0);
 });
 
 test("keeps FE and BE results separate and restores their counts", async ({
   page,
 }) => {
+  let generationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/test-cases/generate"))
+      generationRequests++;
+  });
   await page.setViewportSize({ width: 375, height: 812 });
   await prepareGeneration(page, "Frontend + Backend");
   await page.getByRole("button", { name: "Generate Test Cases" }).click();
   await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
   await expect(page.getByText("Frontend test cases: 3")).toBeVisible();
   await expect(page.getByText("Backend test cases: 3")).toBeVisible();
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  const frontendTab = preview.getByRole("tab", { name: "Frontend (3)" });
+  const backendTab = preview.getByRole("tab", { name: "Backend (3)" });
+  await expect(frontendTab).toHaveAttribute("aria-selected", "true");
+  await expect(preview).toContainText("TP-FE-001");
+  await expect(preview).not.toContainText("TP-BE-001");
+  const requestsAfterGeneration = generationRequests;
+  await backendTab.click();
+  await expect(backendTab).toHaveAttribute("aria-selected", "true");
+  await expect(preview).toContainText("TP-BE-001");
+  await expect(preview).not.toContainText("TP-FE-001");
+  await backendTab.press("ArrowLeft");
+  await expect(frontendTab).toBeFocused();
+  await expect(preview).toContainText("TP-FE-001");
+  expect(generationRequests).toBe(requestsAfterGeneration);
   await page.reload();
   await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Generated Test Cases" }),
+  ).toContainText("TP-FE-001");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
   await page.getByRole("button", { name: "Remove file" }).click();
+  await expect(
+    page.getByRole("region", { name: "Generated Test Cases" }),
+  ).toHaveCount(0);
   expect(
     await page.evaluate(() =>
       sessionStorage.getItem("testpilot.generated-test-cases.v1"),
@@ -532,6 +588,9 @@ test("confirms PRD replacement when generated cases would be cleared", async ({
   });
   await page.getByLabel("Choose PRD file").setInputFiles(reviewFixture);
   await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Generated Test Cases" }),
+  ).toBeVisible();
 
   page.once("dialog", async (dialog) => {
     await dialog.accept();
@@ -541,6 +600,9 @@ test("confirms PRD replacement when generated cases would be cleared", async ({
     page.getByText("Analysis: READY", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText("Generation: COMPLETE")).toHaveCount(0);
+  await expect(
+    page.getByRole("region", { name: "Generated Test Cases" }),
+  ).toHaveCount(0);
   expect(
     await page.evaluate(() =>
       sessionStorage.getItem("testpilot.generated-test-cases.v1"),
@@ -580,6 +642,49 @@ test("shows a safe generation error and supports explicit retry", async ({
     .getByRole("button", { name: "Retry Test Case Generation" })
     .click();
   await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+});
+
+test("shows a valid empty Backend layer without placeholder cases", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend + Backend");
+  await page.route("**/api/test-cases/generate", async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.generation.result.backend = [];
+    await route.fulfill({ response, json: body });
+  });
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  await preview.getByRole("tab", { name: "Backend (0)" }).click();
+  await expect(preview).toContainText(
+    "No Backend test cases were generated from the selected documented requirements.",
+  );
+  await expect(preview).not.toContainText("TP-BE-");
+});
+
+test("renders hostile generated preview content as inert text", async ({
+  page,
+}) => {
+  const hostile = "<script>window.__previewPwned = true</script>";
+  await prepareGeneration(page, "Frontend");
+  await page.route("**/api/test-cases/generate", async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.generation.result.frontend[0].title = hostile;
+    await route.fulfill({ response, json: body });
+  });
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  await expect(preview.getByText(hostile, { exact: true })).toBeVisible();
+  await expect(preview.locator("script")).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () =>
+        (window as typeof window & { __previewPwned?: boolean }).__previewPwned,
+    ),
+  ).toBeUndefined();
 });
 
 test("a late generation response cannot attach to a replacement PRD", async ({

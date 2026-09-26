@@ -4,7 +4,7 @@ TestPilot AI is an MVP for turning a PRD into reviewable Frontend (FE) and Backe
 
 ## Current project status
 
-M0 establishes the application and quality foundation. M1 implements PRD upload and server-authoritative validation, M2 deterministic extraction, M3 grounded Gemini PRD analysis, M4 requirement review and selection, M5 FE/BE test-case generation, M6 preview, M7 manual edit/delete, and M8 export-column selection. See the milestone engineering documents through [M8 Export Column Selection](docs/engineering/M8_EXPORT_COLUMN_SELECTION.md). TSV generation and download remain unimplemented. The current release-managed package version is `0.7.0`; this feature branch does not bump it.
+M0 establishes the application and quality foundation. M1 implements PRD upload and server-authoritative validation, M2 deterministic extraction, M3 grounded Gemini PRD analysis, M4 requirement review and selection, M5 FE/BE test-case generation, M6 preview, M7 manual edit/delete, M8 export-column selection, and M9 deterministic TSV download. See [M9 TSV Export](docs/engineering/M9_TSV_EXPORT.md). The current release-managed package version is `0.7.0`; this feature branch does not bump it.
 
 The [PRD](docs/product/PRD.md) and [Business Flow](docs/product/BUSINESS_FLOW.md), both labeled **1.0 Draft / Approved Baseline for Development**, remain authoritative and unchanged. The [approved decisions OQ-03–OQ-14](docs/product/OPEN_QUESTIONS.md) clarify the implementation baseline. All twelve are resolved; their original subjects, final decisions, approval source, and affected docs remain traceable. The older task brief is historical context only.
 
@@ -32,10 +32,10 @@ Accounts, collaboration, project/history management, Jira/GitHub product integra
 | [docs/product](docs/product/)                                                                     | Product authority, flow, scope, source gaps                           |
 | [docs/engineering](docs/engineering/)                                                             | Implementation recommendations and agent rules                        |
 | [docs/qa](docs/qa/)                                                                               | Strategy, plan, case/data/bug standards, traceability, release checks |
-| [qa/test-cases/frontend](qa/test-cases/frontend/) / [backend](qa/test-cases/backend/)             | M1–M8 FE/BE specifications and future cases                           |
+| [qa/test-cases/frontend](qa/test-cases/frontend/) / [backend](qa/test-cases/backend/)             | M1–M9 FE/BE specifications and future cases                           |
 | [qa/test-execution/frontend](qa/test-execution/frontend/) / [backend](qa/test-execution/backend/) | Actual execution records, kept separate from specifications           |
 | [qa/bug-reports/frontend](qa/bug-reports/frontend/) / [backend](qa/bug-reports/backend/)          | Observed defects only                                                 |
-| [qa/test-data](qa/test-data/)                                                                     | Synthetic documented M1–M5 fixtures reused through M8                 |
+| [qa/test-data](qa/test-data/)                                                                     | Synthetic documented M1–M5 fixtures reused through M9                 |
 | [qa/automation](qa/automation/)                                                                   | Automation conventions; executable tests live in src and tests        |
 
 ## Prerequisites
@@ -81,12 +81,12 @@ Install the Playwright browser once with `npx playwright install chromium`. CI i
 | -------------------- | ------------------------------------------------------------ |
 | `src/app/`           | Next.js upload page, API route and global styling            |
 | `src/config/`        | Server environment schema and validation boundary            |
-| `src/lib/`           | Upload, extraction, analysis, review and generation services |
+| `src/lib/`           | Upload, extraction, analysis, generation and export services |
 | `tests/e2e/`         | Playwright upload/extraction/analysis coverage               |
 | `.github/workflows/` | CI and Release Please automation                             |
 | `.husky/`            | Local commit and push quality gates                          |
 
-Business-service directories are added only by their implementing milestone; M8 column selection is a deterministic client-side preference layer, while TSV serialization and download do not exist.
+Business-service directories are added only by their implementing milestone. M9 projects current M7 cases through the validated M8 selection into local layer-specific TSV downloads; it adds no export API or persistence.
 
 ## Contribution and release flow
 
@@ -94,4 +94,4 @@ Read docs → understand current state → check scope → inspect code → plan
 
 Use a feature branch and Conventional Commits. Pre-commit runs staged lint/format checks, commit-msg runs Commitlint, and pre-push runs typecheck plus unit tests. GitHub Actions repeats validation and E2E. After merge to `main`, Release Please manages release pull requests and v-prefixed tags; it does not bump versions on local pushes. See [Versioning and Release](docs/engineering/VERSIONING_RELEASE.md).
 
-**No unresolved MVP-blocking Open Questions.** M8 implements OQ-07 selection defaults and fixed schema order without AI, backend activity, or file generation. The next milestone is **M9: TSV Export**, under separate authorization.
+**No unresolved MVP-blocking Open Questions.** M9 implements OQ-07/OQ-08 local TSV export without AI, backend activity, history, XLSX, or persistent storage. Later work requires separate milestone authorization.

@@ -1,5 +1,9 @@
 # Security Testing Strategy
 
+## M9 security focus
+
+Treat every exported value as untrusted. Verify embedded TAB/CR/LF cannot create extra rows or columns, Steps remain one numbered cell, and leading-whitespace variants of `=`, `+`, `-`, and `@` receive export-only apostrophe neutralization. Confirm Unicode/BOM, selected public fields only, no source/provider metadata, no state mutation, no network/provider request, correct temporary-anchor removal, and object-URL revocation. Automated coverage is not a penetration test or a manual Excel/Sheets security certification.
+
 ## M8 security focus
 
 Verify the fixed eleven-key allowlist rejects unknown, duplicate, empty final, reordered, malformed, and extra-field configurations. Inspect session state to confirm it stores only public column keys and cannot expose source IDs, case content, prompts, raw responses, PRD text, or secrets. Confirm selection actions perform no network request, serializer, Blob creation, or download and cannot mutate M7 results.

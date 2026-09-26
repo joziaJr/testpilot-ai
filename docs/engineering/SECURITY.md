@@ -71,3 +71,7 @@ M7 treats edited values as untrusted text, revalidates them against the bounded 
 ## M8 implementation
 
 M8 accepts only the eleven fixed public schema keys and validates uniqueness, nonempty selection, and canonical order. Active-session persistence contains only these keys—never case values, source metadata, prompts, provider responses, PRD content, or secrets. Configuration changes perform no request and create no export artifact. See [M8 Export Column Selection](M8_EXPORT_COLUMN_SELECTION.md).
+
+## M9 implementation
+
+M9 maps only the eleven public fields and never exports internal source/provider metadata. Before TAB/CRLF assembly it normalizes embedded TAB, CR, LF and CRLF into readable spaces, flattens numbered Steps into one cell with `|`, and prefixes any value whose first meaningful character is `=`, `+`, `-`, or `@` with an apostrophe. Sanitization affects only the artifact. UTF-8 BOM, fixed filenames, local Blob creation, temporary-anchor removal, and guaranteed object-URL revocation are deterministic client behavior. No content reaches a new route, provider, log, or persistent store. See [M9 TSV Export](M9_TSV_EXPORT.md).

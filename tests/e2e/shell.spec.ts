@@ -1,5 +1,6 @@
 ﻿import { expect, test } from "@playwright/test";
 import path from "node:path";
+import { readFile } from "node:fs/promises";
 const fixture = (name: string) => path.resolve("qa/test-data/m1", name);
 const extractionFixture = (name: string) =>
   path.resolve("qa/test-data/m2", name);
@@ -456,6 +457,16 @@ async function prepareGeneration(
   await page
     .getByRole("button", { name: "Confirm reviewed selection" })
     .click();
+}
+
+async function readTsvDownload(download: import("@playwright/test").Download) {
+  const downloadPath = await download.path();
+  if (!downloadPath) throw new Error("The TSV download has no local path.");
+  const bytes = await readFile(downloadPath);
+  return {
+    bytes,
+    text: new TextDecoder("utf-8").decode(bytes),
+  };
 }
 
 test("generates frontend cases only from a confirmed M4 selection", async ({
@@ -983,6 +994,200 @@ test("falls back safely from malformed persisted export columns", async ({
   await expect(
     configuration.getByLabel("Notes", { exact: true }),
   ).not.toBeChecked();
+});
+
+test("downloads the current Frontend result with OQ-07 defaults and OQ-08 TSV structure", async ({
+  page,
+}) => {
+  let generationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/test-cases/generate"))
+      generationRequests++;
+  });
+  await prepareGeneration(page, "Frontend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const requestsAfterGeneration = generationRequests;
+  const configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+
+  const downloadEvent = page.waitForEvent("download");
+  await configuration
+    .getByRole("button", { name: "Download Frontend TSV" })
+    .click();
+  const download = await downloadEvent;
+  const artifact = await readTsvDownload(download);
+
+  expect(download.suggestedFilename()).toBe("testpilot_frontend.tsv");
+  expect([...artifact.bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
+  expect(artifact.text.split("\r\n")[0]).toBe(
+    "Test Case ID\tModule\tFeature\tTitle\tPreconditions\tSteps\tExpected Result\tPriority\tType",
+  );
+  expect(artifact.text.split("\r\n")).toHaveLength(4);
+  expect(artifact.text).toContain(
+    "1. Perform the documented behavior: Users can create tasks.",
+  );
+  expect(generationRequests).toBe(requestsAfterGeneration);
+  await expect(configuration).toContainText("9 of 11 columns selected");
+  await expect(
+    configuration.getByLabel("Automation", { exact: true }),
+  ).not.toBeChecked();
+});
+
+test("downloads a Backend-only result with the approved filename", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Backend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  await expect(
+    configuration.getByRole("button", { name: "Download Frontend TSV" }),
+  ).toHaveCount(0);
+
+  const downloadEvent = page.waitForEvent("download");
+  await configuration
+    .getByRole("button", { name: "Download Backend TSV" })
+    .click();
+  const download = await downloadEvent;
+  const artifact = await readTsvDownload(download);
+  expect(download.suggestedFilename()).toBe("testpilot_backend.tsv");
+  expect(artifact.text).toContain("TP-BE-001");
+  expect(artifact.text).not.toContain("TP-FE-001");
+});
+
+test("downloads separate Frontend and Backend files with one restored shared selection", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Frontend + Backend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  let configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  await configuration.getByLabel("Automation", { exact: true }).check();
+  await configuration.getByLabel("Notes", { exact: true }).check();
+  await configuration.getByLabel("Preconditions", { exact: true }).uncheck();
+
+  await page.reload();
+  configuration = page.getByRole("region", { name: "Export Configuration" });
+  await expect(configuration).toContainText("10 of 11 columns selected");
+  await expect(
+    configuration.getByRole("button", { name: "Download Frontend TSV" }),
+  ).toBeEnabled();
+  await expect(
+    configuration.getByRole("button", { name: "Download Backend TSV" }),
+  ).toBeEnabled();
+
+  const frontendEvent = page.waitForEvent("download");
+  await configuration
+    .getByRole("button", { name: "Download Frontend TSV" })
+    .click();
+  const frontend = await frontendEvent;
+  const frontendArtifact = await readTsvDownload(frontend);
+  const backendEvent = page.waitForEvent("download");
+  await configuration
+    .getByRole("button", { name: "Download Backend TSV" })
+    .click();
+  const backend = await backendEvent;
+  const backendArtifact = await readTsvDownload(backend);
+
+  expect(frontend.suggestedFilename()).toBe("testpilot_frontend.tsv");
+  expect(backend.suggestedFilename()).toBe("testpilot_backend.tsv");
+  const expectedHeader =
+    "Test Case ID\tModule\tFeature\tTitle\tSteps\tExpected Result\tPriority\tType\tAutomation\tNotes";
+  expect(frontendArtifact.text.split("\r\n")[0]).toBe(expectedHeader);
+  expect(backendArtifact.text.split("\r\n")[0]).toBe(expectedHeader);
+  expect(frontendArtifact.text).toContain("TP-FE-001");
+  expect(frontendArtifact.text).not.toContain("TP-BE-001");
+  expect(backendArtifact.text).toContain("TP-BE-001");
+  expect(backendArtifact.text).not.toContain("TP-FE-001");
+});
+
+test("exports saved M7 edits safely and excludes deleted cases without renumbering", async ({
+  page,
+}) => {
+  let generationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/test-cases/generate"))
+      generationRequests++;
+  });
+  await prepareGeneration(page, "Frontend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const requestsAfterGeneration = generationRequests;
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+
+  await preview.getByRole("button", { name: "Edit TP-FE-001" }).click();
+  const editor = page.getByRole("region", { name: "Edit TP-FE-001" });
+  await editor.getByLabel("Title").fill("=SUM(A1:A2)");
+  await editor
+    .getByLabel("Expected Result")
+    .fill("Tugas berhasil dibuat ✓ 日本語");
+  await editor.getByLabel("Step 1").fill("Open\tpage\r\nReview");
+  await editor.getByRole("button", { name: "Add step" }).click();
+  await editor.getByLabel("Step 2").fill("Submit\nform");
+  await editor.getByRole("button", { name: "Save changes" }).click();
+  page.once("dialog", async (dialog) => dialog.accept());
+  await preview.getByRole("button", { name: "Delete TP-FE-002" }).click();
+
+  const configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  const downloadEvent = page.waitForEvent("download");
+  await configuration
+    .getByRole("button", { name: "Download Frontend TSV" })
+    .click();
+  const artifact = await readTsvDownload(await downloadEvent);
+
+  expect(artifact.text).toContain("'=SUM(A1:A2)");
+  expect(artifact.text).toContain("Tugas berhasil dibuat ✓ 日本語");
+  expect(artifact.text).toContain("1. Open page Review | 2. Submit form");
+  expect(artifact.text).toContain("TP-FE-001");
+  expect(artifact.text).toContain("TP-FE-003");
+  expect(artifact.text).not.toContain("TP-FE-002");
+  expect(artifact.text.split("\r\n")).toHaveLength(3);
+  await expect(preview).toContainText("=SUM(A1:A2)");
+  expect(generationRequests).toBe(requestsAfterGeneration);
+});
+
+test("prevents invalid and empty-layer exports while keeping controls usable on a narrow viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await prepareGeneration(page, "Frontend + Backend");
+  await page.route("**/api/test-cases/generate", async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.generation.result.backend = [];
+    await route.fulfill({ response, json: body });
+  });
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  const frontend = configuration.getByRole("button", {
+    name: "Download Frontend TSV",
+  });
+  const backend = configuration.getByRole("button", {
+    name: "Download Backend TSV",
+  });
+  await expect(frontend).toBeEnabled();
+  await expect(backend).toBeDisabled();
+  await expect(configuration).toContainText(
+    "No test cases available to export.",
+  );
+
+  await configuration.getByRole("button", { name: "Clear All" }).click();
+  await expect(configuration.getByRole("alert")).toHaveText(
+    "Select at least one column for export.",
+  );
+  await expect(frontend).toBeDisabled();
+  await expect(backend).toBeDisabled();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });
 
 test("a late generation response cannot attach to a replacement PRD", async ({

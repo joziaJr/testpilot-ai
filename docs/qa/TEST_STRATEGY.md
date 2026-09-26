@@ -1,12 +1,16 @@
 # Test Strategy
 
+## M8 coverage addition
+
+M8 combines pure allowlist/configuration tests, static component rendering, and Playwright workflows. Coverage verifies OQ-07 first-nine defaults, eleven available options, canonical order, selection counts, Select/Clear All, zero-column validation, malformed-state fallback, shared FE/BE state, refresh and regeneration retention, M7 isolation, narrow-width accessibility, and absence of downloads or new provider/generation requests. M1–M7 suites remain regression gates; no live-model test is required because M8 is deterministic.
+
 ## M7 coverage addition
 
 M7 combines pure mutation tests with static component rendering and Playwright workflows. Coverage verifies schema-valid Save, source-compatible canonical Module/Feature labels, incompatible-label rejection, invalid/duplicate rejection, Cancel, confirmed Delete, immutable IDs/source references, non-renumbering, final empty layers, active-session restoration/invalidation, FE/BE isolation, accessibility, responsive containment, inert hostile edited text, and absence of mutation-time AI/network behavior. Existing M1–M6 suites remain regression gates; no live-model test is required because M7 is deterministic and makes no AI call.
 
 ## Purpose and status
 
-Define how functional and failure behavior will be assessed. M0 environment checks through M7 deterministic edit/delete tests are implemented. See the milestone engineering documents through [M7 Edit/Delete](../engineering/M7_EDIT_DELETE.md) for precise coverage and limitations. Deterministic provider tests remain separate from non-deterministic live-model quality review. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles.
+Define how functional and failure behavior will be assessed. M0 environment checks through M8 deterministic export-column configuration tests are implemented. See the milestone engineering documents through [M8 Export Column Selection](../engineering/M8_EXPORT_COLUMN_SELECTION.md) for precise coverage and limitations. Deterministic provider tests remain separate from non-deterministic live-model quality review. The approved [PRD](../product/PRD.md), particularly §34 Definition of Done, and [Business Flow](../product/BUSINESS_FLOW.md) remain the product oracles.
 
 ## Testing levels
 

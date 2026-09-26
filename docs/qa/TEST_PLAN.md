@@ -1,12 +1,16 @@
 # MVP Test Plan
 
+## M8 export-column selection scope
+
+Validate the local configuration through `qa/test-cases/frontend/M8_EXPORT_COLUMN_SELECTION.md` and its backend-boundary companion. Verify exactly eleven allowlisted columns, first-nine defaults, Automation/Notes off, fixed canonical order with no reorder controls, select/deselect, Select/Clear All, accessible zero-column validation, strict persistence/fallback, one shared FE/BE preference, M7 isolation, regeneration/refresh retention, and no serialization/download/network behavior. TSV generation remains M9.
+
 ## M7 edit/delete scope
 
 Validate the generated-result working copy through the cases in `qa/test-cases/frontend/M7_EDIT_DELETE.md` and `qa/test-cases/backend/M7_EDIT_DELETE.md`. Exercise the eight mutable fields, source-linked read-only Module/Feature labels, incompatible-label rejection, add/remove Steps, required-field and duplicate rejection, Save/Cancel, delete accept/dismiss, stable gaps, zero remaining cases, Both-layer isolation, refresh persistence, upstream invalidation, hostile text, and narrow-width keyboard usability. Confirm there is no M7 endpoint, provider request, regeneration, export, column selection, execution result, or bug workflow.
 
 ## Purpose and evidence status
 
-This business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the runners; M1 adds upload validation; M2 extraction; M3 structured PRD analysis; M4 review and selection; M5 grounded FE/BE generation; M6 separated preview; and M7 manual edit/delete. Implemented details are documented through [M7 Edit/Delete](../engineering/M7_EDIT_DELETE.md). No Actual Result or execution Status is assigned to unexecuted cases.
+This business-feature inventory is reconciled to the approved [PRD](../product/PRD.md) and [Business Flow](../product/BUSINESS_FLOW.md). M0 provides the runners; M1 adds upload validation; M2 extraction; M3 structured PRD analysis; M4 review and selection; M5 grounded FE/BE generation; M6 separated preview; M7 manual edit/delete; and M8 fixed-order export-column selection. Implemented details are documented through [M8 Export Column Selection](../engineering/M8_EXPORT_COLUMN_SELECTION.md). No Actual Result or execution Status is assigned to unexecuted cases.
 
 Turn planning items into cases only with source-backed expectations. The [approved OQ-03–OQ-14 decisions](../product/OPEN_QUESTIONS.md) now provide upload, language, eligibility, session, schema, TSV, retry, privacy, and release oracles. No unresolved MVP-blocking Open Questions remain. TestPilot's 10 MB limit must not be inferred for another uploaded target PRD.
 

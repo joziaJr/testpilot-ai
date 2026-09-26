@@ -67,3 +67,7 @@ M6 renders validated generated strings only through React text nodes and uses no
 ## M7 implementation
 
 M7 treats edited values as untrusted text, revalidates them against the bounded generated-case field schema, and continues to render only React text nodes. Test Case ID and source references are excluded from editing; Module and Feature are read-only and checked again at the mutation boundary against their canonical current values. Save/Delete use no route, provider, environment variable, prompt, or raw response; they replace only the validated active-session result. Automated browser coverage verifies script-like edits remain inert and mutation actions do not produce generation requests. See [M7 Edit/Delete](M7_EDIT_DELETE.md).
+
+## M8 implementation
+
+M8 accepts only the eleven fixed public schema keys and validates uniqueness, nonempty selection, and canonical order. Active-session persistence contains only these keys—never case values, source metadata, prompts, provider responses, PRD content, or secrets. Configuration changes perform no request and create no export artifact. See [M8 Export Column Selection](M8_EXPORT_COLUMN_SELECTION.md).

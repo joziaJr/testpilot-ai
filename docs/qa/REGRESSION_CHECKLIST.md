@@ -1,5 +1,12 @@
 # Regression Checklist
 
+## M8 focus
+
+- Re-run M1 upload through M7 edit/delete lifecycle, identity, isolation, and security coverage.
+- Confirm M8 changes only its allowlisted key preference and never changes FE/BE cases, M7 edits/deletes, IDs, source references, analysis, or generation semantics.
+- Confirm first-nine defaults, canonical order, malformed fallback, and active-session retention.
+- Confirm no TSV, Blob, download, filename, export route, or provider behavior is introduced.
+
 ## M7 focus
 
 - Re-run M1 upload/removal/replacement, M2 extraction, M3 analysis, M4 selection, M5 generation/error/identity, and M6 exact-column/layer/empty/rendering coverage.

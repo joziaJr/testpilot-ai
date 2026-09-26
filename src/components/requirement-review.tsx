@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ExportColumnSelection } from "@/components/export-column-selection";
 import { TestCasePreview } from "@/components/test-case-preview";
 import type { PrdAnalysis } from "@/lib/analysis/analysis-contract";
 import {
@@ -835,11 +836,14 @@ export function RequirementReview({
               <p>Backend test cases: {generation.result.backend.length}</p>
             </div>
             {contract && (
-              <TestCasePreview
-                result={generation.result}
-                testingScope={contract.testingScope}
-                onResultChange={updateGeneratedResult}
-              />
+              <>
+                <TestCasePreview
+                  result={generation.result}
+                  testingScope={contract.testingScope}
+                  onResultChange={updateGeneratedResult}
+                />
+                <ExportColumnSelection />
+              </>
             )}
           </>
         )}

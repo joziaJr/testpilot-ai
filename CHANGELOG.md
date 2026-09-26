@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/joziaJr/testpilot-ai/compare/v0.7.0...v0.8.0) (2026-09-26)
+
+
+### Features
+
+* add export column selection ([eb8fa60](https://github.com/joziaJr/testpilot-ai/commit/eb8fa6056a065f7e8d411a7377fda9c9483ee4d6))
+* add export column selection ([d909739](https://github.com/joziaJr/testpilot-ai/commit/d909739c7bc7eaea8a0c0ef94cc39acc0bfb9b6a))
+
 ## [0.7.0](https://github.com/joziaJr/testpilot-ai/compare/v0.6.0...v0.7.0) (2026-09-24)
 
 

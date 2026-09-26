@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.0](https://github.com/joziaJr/testpilot-ai/compare/v0.8.0...v0.9.0) (2026-09-26)
+
+
+### Features
+
+* add TSV export ([73377fa](https://github.com/joziaJr/testpilot-ai/commit/73377faf16fdcf4d45b3ea771fe105067150609d))
+* add TSV export ([f3b07ff](https://github.com/joziaJr/testpilot-ai/commit/f3b07ffab9e8b1e83bd8fefcfffe9ddb7a0a3ad8))
+
 ## [0.8.0](https://github.com/joziaJr/testpilot-ai/compare/v0.7.0...v0.8.0) (2026-09-26)
 
 

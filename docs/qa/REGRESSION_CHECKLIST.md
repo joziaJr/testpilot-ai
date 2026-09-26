@@ -1,5 +1,12 @@
 # Regression Checklist
 
+## M9 focus
+
+- Re-run M1 upload through M8 selection/session/accessibility/security coverage.
+- Confirm export reads saved M7 edits/deletes, preserves working row order and ID gaps, and never mutates cases or selection.
+- Confirm OQ-07 defaults/order and OQ-08 BOM/CRLF/TAB, single-cell Steps, normalization, and formula safety.
+- Confirm FE/BE files remain separate, empty/invalid layers create no file, and export performs no AI/server request.
+
 ## M8 focus
 
 - Re-run M1 upload through M7 edit/delete lifecycle, identity, isolation, and security coverage.

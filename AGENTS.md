@@ -1,6 +1,6 @@
 # Agent instructions
 
-The repository contains M0, M1 upload validation, M2 document extraction, M3 AI PRD analysis, M4 requirement review and selection, M5 FE/BE test-case generation, M6 preview, M7 manual edit/delete, and M8 export-column selection. See docs/engineering/M1_UPLOAD.md through docs/engineering/M8_EXPORT_COLUMN_SELECTION.md for implemented behavior and limitations. TSV export and later product features must be introduced only by their approved milestone, within MVP scope.
+The repository contains M0, M1 upload validation, M2 document extraction, M3 AI PRD analysis, M4 requirement review and selection, M5 FE/BE test-case generation, M6 preview, M7 manual edit/delete, M8 export-column selection, and M9 deterministic TSV export. See docs/engineering/M1_UPLOAD.md through docs/engineering/M9_TSV_EXPORT.md for implemented behavior and limitations. Later product features must be introduced only by their approved milestone, within MVP scope.
 
 ## Required workflow
 

@@ -8,7 +8,7 @@ Implemented on `feat/export-column-selection`. M8 creates a deterministic active
 M7 edited/deleted working result
   + M8 shared selectedColumns preference
   -> validated future-export configuration
-  -> M9 not implemented
+  -> M9 deterministic TSV projection
 ```
 
 ## Available columns and stable keys
@@ -65,4 +65,4 @@ The fixed allowlist prevents arbitrary keys and internal metadata. M8 imports no
 - Closing the tab/session may discard the preference.
 - A cleared invalid draft returns to the first-nine default after refresh.
 - Custom ordering and saved account preferences are excluded by OQ-07 and post-MVP scope.
-- TSV generation, escaping, filenames, empty-layer export handling, and downloads remain M9.
+- M9 now consumes this validated selection without changing M8 defaults, ordering, or persistence.

@@ -1,5 +1,9 @@
 # Error Handling
 
+## M9 TSV export handling
+
+M9 blocks download when the M8 draft has zero columns or the requested layer has no current cases. It reuses `Select at least one column for export.` and shows `No test cases available to export.` without creating an artifact. A detectable Blob/object-URL/anchor failure shows `Failed to export TSV.` while retaining preview, edits, deletes, IDs, selection, and tab state. Export has no provider/network retry because it is deterministic local behavior.
+
 ## M8 export-column handling
 
 M8 treats zero selected columns as an invalid draft and shows `Select at least one column for export.` No file operation is attempted. Unknown, duplicate, reordered, extra-field, or malformed persisted keys are rejected and safely replaced by the OQ-07 first-nine default. Selection errors do not mutate cases, call a server, or affect M7 state.

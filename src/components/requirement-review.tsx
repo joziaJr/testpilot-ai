@@ -842,7 +842,10 @@ export function RequirementReview({
                   testingScope={contract.testingScope}
                   onResultChange={updateGeneratedResult}
                 />
-                <ExportColumnSelection />
+                <ExportColumnSelection
+                  result={generation.result}
+                  testingScope={contract.testingScope}
+                />
               </>
             )}
           </>

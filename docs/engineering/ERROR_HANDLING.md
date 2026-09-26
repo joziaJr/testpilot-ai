@@ -1,5 +1,9 @@
 # Error Handling
 
+## M8 export-column handling
+
+M8 treats zero selected columns as an invalid draft and shows `Select at least one column for export.` No file operation is attempted. Unknown, duplicate, reordered, extra-field, or malformed persisted keys are rejected and safely replaced by the OQ-07 first-nine default. Selection errors do not mutate cases, call a server, or affect M7 state.
+
 ## M7 edit/delete handling
 
 M7 validates the complete editable field set before Save. Required blank/invalid fields and duplicate same-layer scenarios keep the editor open, show a safe user-facing alert, and leave the saved case untouched. Cancel discards the draft. Delete requires explicit confirmation; dismissal is a no-op. A stale or missing case cannot be edited or deleted through the mutation contract. Deleting the final case is a valid empty layer, not an error. No provider retry or server error path is introduced because M7 performs no request.

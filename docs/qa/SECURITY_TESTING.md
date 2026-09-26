@@ -1,5 +1,9 @@
 # Security Testing Strategy
 
+## M8 security focus
+
+Verify the fixed eleven-key allowlist rejects unknown, duplicate, empty final, reordered, malformed, and extra-field configurations. Inspect session state to confirm it stores only public column keys and cannot expose source IDs, case content, prompts, raw responses, PRD text, or secrets. Confirm selection actions perform no network request, serializer, Blob creation, or download and cannot mutate M7 results.
+
 ## M7 security focus
 
 Treat every manually edited value as untrusted text. Verify script-like content remains inert, no raw HTML or Markdown interpretation occurs, schema length/enums constrain saved data, immutable IDs/source references cannot be edited, source-linked Module/Feature mismatches are rejected, and optional fields normalize safely. Inspect browser requests and repository code to confirm Save/Delete cannot access AI credentials, call provider/generation routes, or log prompts, raw responses, or source PRD content. Session storage remains same-origin active-session state and is cleared by established invalidation paths.

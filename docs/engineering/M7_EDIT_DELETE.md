@@ -44,4 +44,4 @@ Edited values render as React text nodes; markup is not interpreted. M7 has no p
 
 - State is active-session only; browser/tab lifecycle follows OQ-06.
 - Drafts are not retained when closing the editor or switching FE/BE tabs.
-- Step reordering, undo/history, bulk changes, regeneration, M8 column selection, and M9 TSV export are not implemented.
+- Step reordering, undo/history, bulk changes, and regeneration remain excluded. M8 now provides independent fixed-order column selection; M9 TSV export is not implemented.

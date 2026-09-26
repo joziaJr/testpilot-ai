@@ -808,6 +808,183 @@ test("keeps frontend edits and backend deletes isolated in Both scope", async ({
   ).toBe(true);
 });
 
+test("configures approved export columns in fixed order and restores them without export activity", async ({
+  page,
+}) => {
+  let generationRequests = 0;
+  let downloads = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/test-cases/generate"))
+      generationRequests++;
+  });
+  page.on("download", () => downloads++);
+  await prepareGeneration(page, "Frontend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  await expect(configuration).toContainText("9 of 11 columns selected");
+  for (const label of [
+    "Test Case ID",
+    "Module",
+    "Feature",
+    "Title",
+    "Preconditions",
+    "Steps",
+    "Expected Result",
+    "Priority",
+    "Type",
+  ])
+    await expect(
+      configuration.getByLabel(label, { exact: true }),
+    ).toBeChecked();
+  await expect(
+    configuration.getByLabel("Automation", { exact: true }),
+  ).not.toBeChecked();
+  await expect(
+    configuration.getByLabel("Notes", { exact: true }),
+  ).not.toBeChecked();
+
+  const requestsAfterGeneration = generationRequests;
+  await configuration.getByLabel("Automation", { exact: true }).check();
+  await configuration.getByLabel("Preconditions", { exact: true }).uncheck();
+  await expect(configuration).toContainText("9 of 11 columns selected");
+  expect(
+    await configuration
+      .locator('input[type="checkbox"]')
+      .evaluateAll((items) =>
+        items.map((item) => item.getAttribute("aria-label")),
+      ),
+  ).toEqual([
+    "Test Case ID",
+    "Module",
+    "Feature",
+    "Title",
+    "Preconditions",
+    "Steps",
+    "Expected Result",
+    "Priority",
+    "Type",
+    "Automation",
+    "Notes",
+  ]);
+  expect(generationRequests).toBe(requestsAfterGeneration);
+  expect(downloads).toBe(0);
+
+  await page.reload();
+  const restored = page.getByRole("region", { name: "Export Configuration" });
+  await expect(
+    restored.getByLabel("Automation", { exact: true }),
+  ).toBeChecked();
+  await expect(
+    restored.getByLabel("Preconditions", { exact: true }),
+  ).not.toBeChecked();
+
+  await restored.getByRole("button", { name: "Clear All" }).click();
+  await expect(restored).toContainText("0 of 11 columns selected");
+  await expect(restored.getByRole("alert")).toHaveText(
+    "Select at least one column for export.",
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        sessionStorage.getItem("testpilot.export-columns.v1"),
+      ),
+    )
+    .toBeNull();
+
+  await restored.getByRole("button", { name: "Select All" }).click();
+  await expect(restored).toContainText("11 of 11 columns selected");
+  await expect(restored.getByRole("alert")).toHaveCount(0);
+  expect(downloads).toBe(0);
+});
+
+test("keeps one export configuration across M7 mutations, regeneration and Both tabs", async ({
+  page,
+}) => {
+  let generationRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().includes("/api/test-cases/generate"))
+      generationRequests++;
+  });
+  await page.setViewportSize({ width: 375, height: 812 });
+  await prepareGeneration(page, "Frontend + Backend");
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  await configuration.getByLabel("Notes", { exact: true }).check();
+  await configuration.getByLabel("Title", { exact: true }).uncheck();
+  const requestsBeforeMutations = generationRequests;
+
+  const preview = page.getByRole("region", { name: "Generated Test Cases" });
+  await preview.getByRole("button", { name: "Edit TP-FE-001" }).click();
+  const editor = page.getByRole("region", { name: "Edit TP-FE-001" });
+  await editor.getByLabel("Title").fill("M7 edit survives M8 selection");
+  await editor.getByRole("button", { name: "Save changes" }).click();
+  await expect(preview).toContainText("M7 edit survives M8 selection");
+  await expect(
+    configuration.getByLabel("Notes", { exact: true }),
+  ).toBeChecked();
+  await expect(
+    configuration.getByLabel("Title", { exact: true }),
+  ).not.toBeChecked();
+
+  await preview.getByRole("tab", { name: "Backend (3)" }).click();
+  page.once("dialog", async (dialog) => dialog.accept());
+  await preview.getByRole("button", { name: "Delete TP-BE-001" }).click();
+  await expect(preview.getByRole("tab", { name: "Backend (2)" })).toBeVisible();
+  await expect(
+    configuration.getByLabel("Notes", { exact: true }),
+  ).toBeChecked();
+  expect(generationRequests).toBe(requestsBeforeMutations);
+
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  await expect(page.getByText("Generation: COMPLETE")).toBeVisible();
+  const regeneratedConfiguration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  await expect(
+    regeneratedConfiguration.getByLabel("Notes", { exact: true }),
+  ).toBeChecked();
+  await expect(
+    regeneratedConfiguration.getByLabel("Title", { exact: true }),
+  ).not.toBeChecked();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("falls back safely from malformed persisted export columns", async ({
+  page,
+}) => {
+  await prepareGeneration(page, "Backend");
+  await page.evaluate(() =>
+    sessionStorage.setItem(
+      "testpilot.export-columns.v1",
+      JSON.stringify({
+        selectedColumns: ["notes", "unknownInternalReference", "title"],
+      }),
+    ),
+  );
+  await page.getByRole("button", { name: "Generate Test Cases" }).click();
+  const configuration = page.getByRole("region", {
+    name: "Export Configuration",
+  });
+  await expect(configuration).toContainText("9 of 11 columns selected");
+  await expect(
+    configuration.getByLabel("Test Case ID", { exact: true }),
+  ).toBeChecked();
+  await expect(
+    configuration.getByLabel("Automation", { exact: true }),
+  ).not.toBeChecked();
+  await expect(
+    configuration.getByLabel("Notes", { exact: true }),
+  ).not.toBeChecked();
+});
+
 test("a late generation response cannot attach to a replacement PRD", async ({
   page,
 }) => {
